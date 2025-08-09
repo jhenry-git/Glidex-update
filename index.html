@@ -6,12 +6,26 @@
   <title>GlideX - Your Car Rental Companion</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <!-- Google Fonts - Inter -->
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap">
+  <!-- Google Fonts - Inter (for body) and Oswald (for headline) -->
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Oswald:wght@700&display=swap">
   <style>
     body {
       font-family: 'Inter', sans-serif;
     }
+    /* Tailwind Animations */
+    @keyframes fadeIn {
+      0% { opacity: 0; transform: translateY(10px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      0% { opacity: 0; transform: translateY(30px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fadeIn { animation: fadeIn 0.8s ease forwards; }
+    .animate-slideUp { animation: slideUp 1s ease forwards; }
+    .animate-fadeIn.delay-200 { animation-delay: 0.2s; }
+    .animate-fadeIn.delay-300 { animation-delay: 0.3s; }
+    .animate-fadeIn.delay-500 { animation-delay: 0.5s; }
   </style>
 </head>
 <body class="bg-blue-50 text-gray-800">
@@ -43,36 +57,59 @@
   </header>
 
   <!-- Hero Section -->
-  <section class="py-16 md:py-24">
-    <div class="container mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center gap-12">
-      <!-- Hero Text Content -->
+  <section class="relative bg-gradient-to-b from-white via-blue-50 to-white py-16 px-6 md:px-12">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
+      
+      <!-- Text Content -->
       <div class="md:w-1/2 text-center md:text-left">
-        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-blue-900 mb-6 leading-tight">
-          Your Next Adventure, <br class="hidden lg:inline">Starts Here.
-        </h1>
-        <p class="text-lg text-gray-600 mb-8 max-w-lg mx-auto md:mx-0">
-          Book cars instantly, connect with trusted hosts, and enjoy a seamless rental experience anytime, anywhere.
+        <!-- Tagline -->
+        <p class="text-sm uppercase tracking-widest text-blue-600 font-semibold mb-3 animate-fadeIn">
+          Drive Your Dreams
         </p>
-        <!-- Call-to-action buttons -->
-        <div class="flex flex-col sm:flex-row justify-center md:justify-start gap-4">
-          <a href="#" class="bg-blue-600 text-white font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-blue-700 transition-transform transform hover:-translate-y-1 inline-flex items-center justify-center space-x-2">
+        
+        <!-- Main Heading -->
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 animate-slideUp">
+          Your Next <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">Adventure</span>,<br class="hidden lg:inline">Starts Here.
+        </h1>
+        
+        <!-- Subheading -->
+        <p class="text-lg text-gray-600 mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed animate-fadeIn delay-200">
+          Book cars <span class="font-semibold text-blue-600">instantly</span>, connect with 
+          <span class="font-semibold">trusted hosts</span>, and enjoy a 
+          <span class="font-semibold">seamless rental experience</span> anytime, anywhere.
+        </p>
+
+        <!-- CTA Buttons -->
+        <!-- Updated button layout to include app download links -->
+        <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fadeIn delay-300">
+          <a href="#book" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-lg transition duration-300">
+            🚗 Book Now
+          </a>
+          <a href="#learn-more" class="px-6 py-3 border border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition duration-300">
+            Learn More
+          </a>
+        </div>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fadeIn delay-300 mt-4">
+          <a href="#" class="bg-gray-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-900 transition-transform transform hover:-translate-y-1 inline-flex items-center justify-center space-x-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
               <path d="M7 11v6H5V7h2V5H5v-2h2c1.66 0 3 1.34 3 3v8h2V7c0-1.66 1.34-3 3-3h2V2h-2c-2.76 0-5 2.24-5 5v5h-2V5c0-1.66-1.34-3-3-3H2v2h2v4H2v2h2v6H2v2h2c1.66 0 3-1.34 3-3v-6zm12-4V5h-2V2h-2v3c0 1.66 1.34 3 3 3z"/>
             </svg>
-            <span>Download on App Store</span>
+            <span>App Store</span>
           </a>
-          <a href="#" class="bg-gray-200 text-blue-600 font-semibold py-3 px-6 rounded-full shadow-lg hover:bg-gray-300 transition-transform transform hover:-translate-y-1 inline-flex items-center justify-center space-x-2">
+          <a href="#" class="bg-gray-800 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:bg-gray-900 transition-transform transform hover:-translate-y-1 inline-flex items-center justify-center space-x-2">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="currentColor">
               <path d="M19 12h-2V5h-2v7h-2V5h-2v7H9V5H7v7H5V5H3v14h18V5h-2v7z"/>
             </svg>
-            <span>Download on Google Play</span>
+            <span>Google Play</span>
           </a>
         </div>
       </div>
+
       <!-- Hero Image -->
-      <div class="md:w-1/2 flex justify-center">
-        <!-- Placeholder image with rounded corners and a shadow -->
-        <img src="rent.png" alt="Car Rental App Preview" class="rounded-3xl shadow-2xl w-full max-w-xl transition-transform duration-300 hover:scale-105" onerror="this.src='https://placehold.co/600x400/94a3b8/e2e8f0?text=Image+Not+Found'">
+      <div class="md:w-1/2 flex justify-center animate-fadeIn delay-500">
+        <img src="https://images.unsplash.com/photo-1503376780353-7e6692767b70?w=800&q=80" 
+             alt="Luxury Car" 
+             class="rounded-xl shadow-xl border border-gray-200">
       </div>
     </div>
   </section>
