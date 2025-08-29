@@ -15,6 +15,9 @@
         .accordion-content.open { max-height: 200px; /* Adjust this value as needed for content height */ }
         .faq-toggle .fas { transition: transform 0.3s ease; }
         .faq-toggle[aria-expanded="true"] .fas { transform: rotate(180deg); }
+        .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08), 0 5px 10px rgba(0, 0, 0, 0.05); }
+        .book-button-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
     </style>
 </head>
 <body class="bg-blue-50 text-gray-800">
@@ -56,7 +59,7 @@
                     Book <span class="font-semibold text-blue-600">instantly</span>, connect with <span class="font-semibold">verified hosts</span>, and enjoy a <span class="font-semibold">seamless rental</span> across Kenya.
                 </p>
                 <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
-                    <a href="#book" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-lg transition">🚗 Book Now</a>
+                    <a href="#book" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-lg transition book-button-pulse">🚗 Book Now</a>
                     <a href="#learn-more" class="px-6 py-3 border border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition">Learn More</a>
                 </div>
                 <div class="flex flex-row gap-3 justify-center md:justify-start mt-6">
@@ -65,7 +68,7 @@
                 </div>
             </div>
             <div class="md:w-1/2 flex justify-center">
-                <img src="https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg" alt="Luxury car rental" class="rounded-xl shadow-xl border border-gray-200">
+                <img src="https://images.unsplash.com/photo-1542362567-b080c1110047?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="A sleek, modern car driving on the road at sunset" class="rounded-xl shadow-xl border border-gray-200">
             </div>
         </div>
     </section>
@@ -75,7 +78,7 @@
             <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-4">Why Choose GlideX?</h2>
             <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">Car rentals made simple, safe, and stress-free.</p>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="p-8 rounded-2xl bg-blue-50 shadow-md hover:border-blue-600 hover:shadow-lg transition border border-transparent">
+                <div class="p-8 rounded-2xl bg-blue-50 shadow-md hover:border-blue-600 hover:shadow-lg transition border border-transparent card-hover">
                     <div class="flex justify-center mb-4">
                         <i class="fas fa-bolt text-blue-600 text-4xl"></i>
                     </div>
@@ -83,7 +86,7 @@
                     <p class="text-sm text-gray-500 mb-2">Book within 2 taps</p>
                     <p class="text-gray-600">Find and confirm your ideal car quickly, no waiting.</p>
                 </div>
-                <div class="p-8 rounded-2xl bg-blue-50 shadow-md hover:border-blue-600 hover:shadow-lg transition border border-transparent">
+                <div class="p-8 rounded-2xl bg-blue-50 shadow-md hover:border-blue-600 hover:shadow-lg transition border border-transparent card-hover">
                     <div class="flex justify-center mb-4">
                         <i class="fas fa-user-check text-blue-600 text-4xl"></i>
                     </div>
@@ -91,7 +94,7 @@
                     <p class="text-sm text-gray-500 mb-2">Verified community</p>
                     <p class="text-gray-600">All car owners are screened and verified for safety.</p>
                 </div>
-                <div class="p-8 rounded-2xl bg-blue-50 shadow-md hover:border-blue-600 hover:shadow-lg transition border border-transparent">
+                <div class="p-8 rounded-2xl bg-blue-50 shadow-md hover:border-blue-600 hover:shadow-lg transition border border-transparent card-hover">
                     <div class="flex justify-center mb-4">
                         <i class="fas fa-headset text-blue-600 text-4xl"></i>
                     </div>
@@ -108,20 +111,20 @@
             <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-4">What Our Users Say</h2>
             <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">Real reviews from happy drivers.</p>
             <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-6 rounded-2xl shadow-md">
-                    <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-12 h-12 rounded-full mx-auto mb-3">
+                <div class="bg-white p-6 rounded-2xl shadow-md card-hover">
+                    <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="A photo of Sarah K." class="w-12 h-12 rounded-full mx-auto mb-3 border-2 border-blue-600">
                     <p class="text-gray-600 italic mb-4">“Booking a car took less than 5 minutes. Super smooth experience!”</p>
                     <div class="flex justify-center text-yellow-400 mb-2">⭐⭐⭐⭐⭐</div>
                     <h4 class="font-semibold text-blue-800">Sarah K.</h4>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow-md">
-                    <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-12 h-12 rounded-full mx-auto mb-3">
+                <div class="bg-white p-6 rounded-2xl shadow-md card-hover">
+                    <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="A photo of James M." class="w-12 h-12 rounded-full mx-auto mb-3 border-2 border-blue-600">
                     <p class="text-gray-600 italic mb-4">“Loved the SUV for our Naivasha trip. Host was friendly and professional.”</p>
                     <div class="flex justify-center text-yellow-400 mb-2">⭐⭐⭐⭐⭐</div>
                     <h4 class="font-semibold text-blue-800">James M.</h4>
                 </div>
-                <div class="bg-white p-6 rounded-2xl shadow-md">
-                    <img src="https://randomuser.me/api/portraits/women/68.jpg" class="w-12 h-12 rounded-full mx-auto mb-3">
+                <div class="bg-white p-6 rounded-2xl shadow-md card-hover">
+                    <img src="https://randomuser.me/api/portraits/women/68.jpg" alt="A photo of Anita W." class="w-12 h-12 rounded-full mx-auto mb-3 border-2 border-blue-600">
                     <p class="text-gray-600 italic mb-4">“24/7 support really works! They helped me within minutes.”</p>
                     <div class="flex justify-center text-yellow-400 mb-2">⭐⭐⭐⭐⭐</div>
                     <h4 class="font-semibold text-blue-800">Anita W.</h4>
@@ -135,8 +138,8 @@
             <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-4">Our Most Popular Cars</h2>
             <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">Top-rated vehicles available on GlideX.</p>
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:scale-105 transition">
-                    <img src="https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg" alt="Luxury sedan" class="w-full h-52 object-cover">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-all card-hover">
+                    <img src="https://images.unsplash.com/photo-1517524005183-5034177c9557?q=80&w=2671&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Luxury sedan" class="w-full h-52 object-cover">
                     <div class="p-6 text-left">
                         <h3 class="text-xl font-semibold text-blue-900">Luxury Sedan</h3>
                         <p class="text-gray-500 mt-1 mb-4">Perfect for business trips or getaways.</p>
@@ -146,8 +149,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:scale-105 transition">
-                    <img src="https://images.pexels.com/photos/210019/pexels-photo-210019.jpeg" alt="Spacious SUV" class="w-full h-52 object-cover">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-all card-hover">
+                    <img src="https://images.unsplash.com/photo-1547476538-23218765f02d?q=80&w=2671&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Spacious SUV" class="w-full h-52 object-cover">
                     <div class="p-6 text-left">
                         <h3 class="text-xl font-semibold text-blue-900">Spacious SUV</h3>
                         <p class="text-gray-500 mt-1 mb-4">Ideal for family road trips.</p>
@@ -157,8 +160,8 @@
                         </div>
                     </div>
                 </div>
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:scale-105 transition">
-                    <img src="https://images.pexels.com/photos/210019/pexels-photo-210019.jpeg" alt="Sport Convertible" class="w-full h-52 object-cover">
+                <div class="bg-white rounded-xl shadow-lg overflow-hidden transition-all card-hover">
+                    <img src="https://images.unsplash.com/photo-1506456012656-1f9e29a99ae6?q=80&w=2670&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="Sport convertible" class="w-full h-52 object-cover">
                     <div class="p-6 text-left">
                         <h3 class="text-xl font-semibold text-blue-900">Sport Convertible</h3>
                         <p class="text-gray-500 mt-1 mb-4">Experience the thrill of the open road.</p>
@@ -176,8 +179,7 @@
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-8">Frequently Asked Questions</h2>
             <div class="max-w-3xl mx-auto text-left space-y-4">
-
-                <div class="border border-blue-200 rounded-lg overflow-hidden shadow-sm">
+                <div class="border border-blue-200 rounded-lg overflow-hidden shadow-sm card-hover">
                     <button class="w-full flex justify-between items-center px-6 py-4 text-left font-semibold text-blue-800 faq-toggle" aria-expanded="false">
                         How do I book a car? <i class="fas fa-chevron-down text-blue-600"></i>
                     </button>
@@ -185,8 +187,7 @@
                         <p>Simply download the GlideX app, browse the list of available cars, choose your preferred vehicle, and confirm your booking instantly. Our platform is designed for a quick and seamless experience with no unnecessary waiting.</p>
                     </div>
                 </div>
-
-                <div class="border border-blue-200 rounded-lg overflow-hidden shadow-sm">
+                <div class="border border-blue-200 rounded-lg overflow-hidden shadow-sm card-hover">
                     <button class="w-full flex justify-between items-center px-6 py-4 text-left font-semibold text-blue-800 faq-toggle" aria-expanded="false">
                         What documents do I need to rent a car? <i class="fas fa-chevron-down text-blue-600"></i>
                     </button>
@@ -194,8 +195,7 @@
                         <p>You will need a valid national ID or passport, and a valid driver's license that you have held for at least one year. For foreigners, an International Driving Permit (IDP) may also be required.</p>
                     </div>
                 </div>
-
-                <div class="border border-blue-200 rounded-lg overflow-hidden shadow-sm">
+                <div class="border border-blue-200 rounded-lg overflow-hidden shadow-sm card-hover">
                     <button class="w-full flex justify-between items-center px-6 py-4 text-left font-semibold text-blue-800 faq-toggle" aria-expanded="false">
                         Is insurance included in the rental price? <i class="fas fa-chevron-down text-blue-600"></i>
                     </button>
@@ -203,8 +203,7 @@
                         <p>Yes, all cars listed on GlideX come with comprehensive insurance coverage. However, a security deposit is required and is fully refundable upon the safe return of the vehicle.</p>
                     </div>
                 </div>
-
-                <div class="border border-blue-200 rounded-lg overflow-hidden shadow-sm">
+                <div class="border border-blue-200 rounded-lg overflow-hidden shadow-sm card-hover">
                     <button class="w-full flex justify-between items-center px-6 py-4 text-left font-semibold text-blue-800 faq-toggle" aria-expanded="false">
                         What is the minimum age to rent a car? <i class="fas fa-chevron-down text-blue-600"></i>
                     </button>
@@ -212,8 +211,7 @@
                         <p>The minimum age to rent a car on our platform is 23 years old. You must also have a valid driver's license held for at least one year.</p>
                     </div>
                 </div>
-                
-                <div class="border border-blue-200 rounded-lg overflow-hidden shadow-sm">
+                <div class="border border-blue-200 rounded-lg overflow-hidden shadow-sm card-hover">
                     <button class="w-full flex justify-between items-center px-6 py-4 text-left font-semibold text-blue-800 faq-toggle" aria-expanded="false">
                         Can I cancel my booking? <i class="fas fa-chevron-down text-blue-600"></i>
                     </button>
@@ -221,7 +219,6 @@
                         <p>Yes, you can cancel your booking directly through the app. Our refund policy depends on the timing of your cancellation. Please refer to our terms and conditions for full details on the cancellation policy.</p>
                     </div>
                 </div>
-
             </div>
         </div>
     </section>
@@ -230,25 +227,20 @@
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
             <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-4">Get In Touch</h2>
             <p class="text-lg text-gray-600 mb-8">Questions? Reach out to us. We're here to help!</p>
-            
             <div class="flex flex-col md:flex-row justify-center items-center gap-6 md:gap-12">
-                
                 <div class="flex items-center space-x-2">
                     <i class="fas fa-envelope text-blue-600 text-2xl"></i>
                     <a href="mailto:support@glidexp.com" class="text-blue-600 text-xl font-semibold hover:underline">
                         support@glidexp.com
                     </a>
                 </div>
-                
                 <div class="flex items-center space-x-6">
                     <a href="https://www.instagram.com/glide_xp/" target="_blank" class="transition-transform transform hover:scale-110" aria-label="Follow us on Instagram">
-                        <i class="fab fa-instagram text-3xl text-gray-700" style="background: radial-gradient(circle at 30% 30%, #fdf497, #fd5949, #d6249f, #285AEB); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+                        <i class="fab fa-instagram text-3xl" style="background: radial-gradient(circle at 30% 30%, #fdf497, #fd5949, #d6249f, #285AEB); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
                     </a>
-                    
                     <a href="https://www.tiktok.com/@glide_x4" target="_blank" class="transition-transform transform hover:scale-110" aria-label="Follow us on TikTok">
                         <i class="fab fa-tiktok text-3xl text-gray-700" style="color: #000; text-shadow: -2px -2px 0 #25F4EE, 2px 2px 0 #FE2C55;"></i>
                     </a>
-                    
                     <a href="https://x.com/GlideXpp" target="_blank" class="transition-transform transform hover:scale-110" aria-label="Follow us on X (Twitter)">
                         <i class="fab fa-x-twitter text-3xl text-gray-700"></i>
                     </a>
