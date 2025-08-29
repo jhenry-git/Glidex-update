@@ -1,246 +1,218 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GlideX - Your Car Rental Companion</title>
-    <meta name="description" content="GlideX is your trusted car rental companion in Kenya. Book instantly, connect with verified hosts, and enjoy seamless rentals at the best rates.">
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Oswald:wght@700&display=swap">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        body { font-family: 'Inter', sans-serif; }
-        @keyframes fadeIn { 0% { opacity: 0; transform: translateY(10px);} 100% { opacity: 1; transform: translateY(0);} }
-        @keyframes slideUp { 0% { opacity: 0; transform: translateY(30px);} 100% { opacity: 1; transform: translateY(0);} }
-        .animate-fadeIn { animation: fadeIn 0.8s ease forwards; }
-        .animate-slideUp { animation: slideUp 1s ease forwards; }
-        .animate-fadeIn.delay-200 { animation-delay: 0.2s; }
-        .animate-fadeIn.delay-300 { animation-delay: 0.3s; }
-        .animate-fadeIn.delay-500 { animation-delay: 0.5s; }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GlideX - Your Car Rental Companion</title>
+  <meta name="description" content="GlideX is your trusted car rental companion in Kenya. Book instantly, connect with verified hosts, and enjoy seamless rentals at the best rates.">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Oswald:wght@700&display=swap">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    .active-link { color: #1d4ed8; font-weight: 600; }
+    .accordion-content { display: none; }
+    .accordion-content.open { display: block; }
+    .transition-max { transition: max-height 0.3s ease; }
+  </style>
 </head>
 <body class="bg-blue-50 text-gray-800">
 
-    <header class="bg-white shadow-sm sticky top-0 z-50">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
-            <a href="#" class="flex items-center space-x-2">
-                <img src="logo.png" alt="GlideX Car Rental Logo" class="h-8" onerror="this.src='https://placehold.co/32x32/1d4ed8/ffffff?text=GX'">
-                <span class="text-2xl font-bold text-blue-900">GlideX</span>
-            </a>
-            <nav class="hidden md:flex items-center space-x-6">
-                <a href="#" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">Home</a>
-                <a href="#features" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">How It Works</a>
-                <a href="#contact" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">Contact</a>
-            </nav>
-            <div class="md:hidden">
-                <button id="menuBtn" class="text-gray-600 hover:text-blue-600 focus:outline-none" aria-label="Open Menu">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                    </svg>
-                </button>
+  <!-- HEADER -->
+  <header class="bg-white shadow-sm sticky top-0 z-50">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
+      <a href="#" class="flex items-center space-x-2">
+        <img src="logo.png" alt="GlideX Car Rental Logo" class="h-8" onerror="this.src='https://placehold.co/32x32/1d4ed8/ffffff?text=GX'">
+        <span class="text-2xl font-bold text-blue-900">GlideX</span>
+      </a>
+      <nav class="hidden md:flex items-center space-x-6">
+        <a href="#" class="text-gray-600 hover:text-blue-600 font-medium transition-colors active-link">Home</a>
+        <a href="#features" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">How It Works</a>
+        <a href="#contact" class="text-gray-600 hover:text-blue-600 font-medium transition-colors">Contact</a>
+        <a href="#book" class="ml-4 px-4 py-2 bg-blue-600 text-white rounded-lg shadow hover:bg-blue-700 transition">Book Now</a>
+      </nav>
+      <div class="md:hidden">
+        <button id="menuBtn" class="text-gray-600 hover:text-blue-600 focus:outline-none" aria-label="Open Menu">
+          <i class="fas fa-bars text-2xl"></i>
+        </button>
+      </div>
+    </div>
+    <div id="mobileMenu" class="hidden md:hidden bg-white shadow-md transition-all duration-300">
+      <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-blue-50">Home</a>
+      <a href="#features" class="block px-4 py-2 text-gray-600 hover:bg-blue-50">How It Works</a>
+      <a href="#contact" class="block px-4 py-2 text-gray-600 hover:bg-blue-50">Contact</a>
+      <a href="#book" class="block px-4 py-2 text-blue-600 font-semibold">🚗 Book Now</a>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="relative bg-gradient-to-b from-white via-blue-50 to-white py-16 px-6 md:px-12">
+    <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
+      <div class="md:w-1/2 text-center md:text-left">
+        <p class="text-sm uppercase tracking-widest text-blue-600 font-semibold mb-3">Drive Your Dreams</p>
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
+          Your Next <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">Adventure</span> <br class="hidden lg:inline"> Starts Here
+        </h1>
+        <p class="text-lg text-gray-700 mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed">
+          Book <span class="font-semibold text-blue-600">instantly</span>, connect with <span class="font-semibold">verified hosts</span>, and enjoy a <span class="font-semibold">seamless rental</span> across Kenya.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+          <a href="#book" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-lg transition">🚗 Book Now</a>
+          <a href="#learn-more" class="px-6 py-3 border border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition">Learn More</a>
+        </div>
+        <div class="flex flex-row gap-3 justify-center md:justify-start mt-6">
+          <a href="https://apps.apple.com/ke/app/glidex/id6751563258" target="_blank"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download GlideX on App Store" class="h-10"></a>
+          <a href="https://play.google.com/store/apps/details?id=com.anonymous.GlideX" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Download GlideX on Google Play" class="h-10"></a>
+        </div>
+      </div>
+      <div class="md:w-1/2 flex justify-center">
+        <img src="https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg" alt="Luxury car rental" class="rounded-xl shadow-xl border border-gray-200">
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="bg-white py-16 md:py-24">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-4">Why Choose GlideX?</h2>
+      <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">Car rentals made simple, safe, and stress-free.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="p-8 rounded-2xl bg-blue-50 shadow-md hover:border-blue-600 hover:shadow-lg transition border border-transparent">
+          <div class="flex justify-center mb-4">
+            <i class="fas fa-bolt text-blue-600 text-4xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-blue-800 mb-1">Instant Booking</h3>
+          <p class="text-sm text-gray-500 mb-2">Book within 2 taps</p>
+          <p class="text-gray-600">Find and confirm your ideal car quickly, no waiting.</p>
+        </div>
+        <div class="p-8 rounded-2xl bg-blue-50 shadow-md hover:border-blue-600 hover:shadow-lg transition border border-transparent">
+          <div class="flex justify-center mb-4">
+            <i class="fas fa-user-check text-blue-600 text-4xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-blue-800 mb-1">Trusted Hosts</h3>
+          <p class="text-sm text-gray-500 mb-2">Verified community</p>
+          <p class="text-gray-600">All car owners are screened and verified for safety.</p>
+        </div>
+        <div class="p-8 rounded-2xl bg-blue-50 shadow-md hover:border-blue-600 hover:shadow-lg transition border border-transparent">
+          <div class="flex justify-center mb-4">
+            <i class="fas fa-headset text-blue-600 text-4xl"></i>
+          </div>
+          <h3 class="text-xl font-semibold text-blue-800 mb-1">24/7 Support</h3>
+          <p class="text-sm text-gray-500 mb-2">Always available</p>
+          <p class="text-gray-600">Help is just a call or message away at any hour.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TESTIMONIALS -->
+  <section class="bg-gray-100 py-16 md:py-24">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-4">What Our Users Say</h2>
+      <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">Real reviews from happy drivers.</p>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="bg-white p-6 rounded-2xl shadow-md">
+          <img src="https://randomuser.me/api/portraits/women/44.jpg" class="w-12 h-12 rounded-full mx-auto mb-3">
+          <p class="text-gray-600 italic mb-4">“Booking a car took less than 5 minutes. Super smooth experience!”</p>
+          <div class="flex justify-center text-yellow-400 mb-2">⭐⭐⭐⭐⭐</div>
+          <h4 class="font-semibold text-blue-800">Sarah K.</h4>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-md">
+          <img src="https://randomuser.me/api/portraits/men/32.jpg" class="w-12 h-12 rounded-full mx-auto mb-3">
+          <p class="text-gray-600 italic mb-4">“Loved the SUV for our Naivasha trip. Host was friendly and professional.”</p>
+          <div class="flex justify-center text-yellow-400 mb-2">⭐⭐⭐⭐⭐</div>
+          <h4 class="font-semibold text-blue-800">James M.</h4>
+        </div>
+        <div class="bg-white p-6 rounded-2xl shadow-md">
+          <img src="https://randomuser.me/api/portraits/women/68.jpg" class="w-12 h-12 rounded-full mx-auto mb-3">
+          <p class="text-gray-600 italic mb-4">“24/7 support really works! They helped me within minutes.”</p>
+          <div class="flex justify-center text-yellow-400 mb-2">⭐⭐⭐⭐⭐</div>
+          <h4 class="font-semibold text-blue-800">Anita W.</h4>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POPULAR CARS -->
+  <section class="bg-blue-50 py-16 md:py-24">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-4">Our Most Popular Cars</h2>
+      <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">Top-rated vehicles available on GlideX.</p>
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:scale-105 transition">
+          <img src="https://images.pexels.com/photos/358070/pexels-photo-358070.jpeg" alt="Luxury sedan" class="w-full h-52 object-cover">
+          <div class="p-6 text-left">
+            <h3 class="text-xl font-semibold text-blue-900">Luxury Sedan</h3>
+            <p class="text-gray-500 mt-1 mb-4">Perfect for business trips or getaways.</p>
+            <div class="flex justify-between items-center">
+              <span class="text-2xl font-bold text-blue-600">KES 12,000<span class="text-sm text-gray-400">/day</span></span>
+              <a href="#" class="bg-blue-600 text-white py-2 px-5 rounded-full hover:bg-blue-700 transition">Book</a>
             </div>
+          </div>
         </div>
-        <div id="mobileMenu" class="hidden md:hidden bg-white shadow-md">
-            <a href="#" class="block px-4 py-2 text-gray-600 hover:bg-blue-50">Home</a>
-            <a href="#features" class="block px-4 py-2 text-gray-600 hover:bg-blue-50">How It Works</a>
-            <a href="#contact" class="block px-4 py-2 text-gray-600 hover:bg-blue-50">Contact</a>
-        </div>
-    </header>
-
-    <section class="relative bg-gradient-to-b from-white via-blue-50 to-white py-16 px-6 md:px-12">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
-            <div class="md:w-1/2 text-center md:text-left">
-                <p class="text-sm uppercase tracking-widest text-blue-600 font-semibold mb-3 animate-fadeIn">Drive Your Dreams</p>
-                <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 animate-slideUp">
-                    Your Next <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">Adventure</span>,<br class="hidden lg:inline">Starts Here.
-                </h1>
-                <p class="text-lg text-gray-600 mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed animate-fadeIn delay-200">
-                    Book cars <span class="font-semibold text-blue-600">instantly</span>, connect with <span class="font-semibold">trusted hosts</span>, and enjoy a <span class="font-semibold">seamless rental experience</span> anytime, anywhere.
-                </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start animate-fadeIn delay-300">
-                    <a href="#book" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-lg transition duration-300">🚗 Book Now</a>
-                    <a href="#learn-more" class="px-6 py-3 border border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition duration-300">Learn More</a>
-                </div>
-                <div class="flex flex-row gap-3 justify-center md:justify-start mt-4">
-                    <a href="https://apps.apple.com/ke/app/glidex/id6751563258" target="_blank"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download GlideX on the App Store" class="h-10 w-auto"></a>
-                    <a href="https://play.google.com/store/apps/details?id=com.anonymous.GlideX" target="_blank"><img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Get GlideX on Google Play" class="h-10 w-auto"></a>
-                </div>
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:scale-105 transition">
+          <img src="https://images.pexels.com/photos/210019/pexels-photo-210019.jpeg" alt="Spacious SUV" class="w-full h-52 object-cover">
+          <div class="p-6 text-left">
+            <h3 class="text-xl font-semibold text-blue-900">Spacious SUV</h3>
+            <p class="text-gray-500 mt-1 mb-4">Ideal for family road trips.</p>
+            <div class="flex justify-between items-center">
+              <span class="text-2xl font-bold text-blue-600">KES 15,000<span class="text-sm text-gray-400">/day</span></span>
+              <a href="#" class="bg-blue-600 text-white py-2 px-5 rounded-full hover:bg-blue-700 transition">Book</a>
             </div>
-            <div class="md:w-1/2 flex justify-center animate-fadeIn delay-500">
-                <img src="rent.png" alt="Luxury car available for rental on GlideX" class="rounded-xl shadow-xl border border-gray-200">
+          </div>
+        </div>
+        <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:scale-105 transition">
+          <img src="https://images.pexels.com/photos/210019/pexels-photo-210019.jpeg" alt="Sport Convertible" class="w-full h-52 object-cover">
+          <div class="p-6 text-left">
+            <h3 class="text-xl font-semibold text-blue-900">Sport Convertible</h3>
+            <p class="text-gray-500 mt-1 mb-4">Experience the thrill of the open road.</p>
+            <div class="flex justify-between items-center">
+              <span class="text-2xl font-bold text-blue-600">KES 18,000<span class="text-sm text-gray-400">/day</span></span>
+              <a href="#" class="bg-blue-600 text-white py-2 px-5 rounded-full hover:bg-blue-700 transition">Book</a>
             </div>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <section id="features" class="bg-white py-16 md:py-24">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-4">Why Choose GlideX?</h2>
-            <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">We make car rentals simple, safe, and stress-free. Here's what sets us apart.</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="p-8 rounded-2xl bg-blue-50 shadow-md hover:scale-105 hover:shadow-lg transition">
-                    <div class="flex justify-center mb-4">
-                        <i class="fas fa-bolt text-blue-600 text-4xl" aria-hidden="true"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-blue-800 mb-2">Instant Booking</h3>
-                    <p class="text-gray-600">Find and book your ideal car in just a few taps. No waiting, no hassle.</p>
-                </div>
-                <div class="p-8 rounded-2xl bg-blue-50 shadow-md hover:scale-105 hover:shadow-lg transition">
-                    <div class="flex justify-center mb-4">
-                        <i class="fas fa-user-check text-blue-600 text-4xl" aria-hidden="true"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-blue-800 mb-2">Trusted Hosts</h3>
-                    <p class="text-gray-600">Connect with a community of verified car owners who care about your experience.</p>
-                </div>
-                <div class="p-8 rounded-2xl bg-blue-50 shadow-md hover:scale-105 hover:shadow-lg transition">
-                    <div class="flex justify-center mb-4">
-                        <i class="fas fa-headset text-blue-600 text-4xl" aria-hidden="true"></i>
-                    </div>
-                    <h3 class="text-xl font-semibold text-blue-800 mb-2">24/7 Support</h3>
-                    <p class="text-gray-600">Our dedicated support team is always here to help, day or night.</p>
-                </div>
-            </div>
+  <!-- FAQ -->
+  <section class="bg-white py-16 md:py-24">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-8">Frequently Asked Questions</h2>
+      <div class="max-w-3xl mx-auto text-left space-y-4">
+        <div class="border rounded-lg">
+          <button class="w-full flex justify-between items-center px-4 py-3 text-left font-semibold text-blue-800 faq-toggle">
+            How do I book a car? <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="accordion-content px-4 pb-3 text-gray-600">Browse cars, choose your vehicle, and confirm payment instantly in-app.</div>
         </div>
-    </section>
-
-    <section class="bg-gray-100 py-16 md:py-24">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-4">What Our Users Say</h2>
-            <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">Real stories from real drivers who’ve enjoyed GlideX.</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div class="bg-white p-6 rounded-2xl shadow-md">
-                    <p class="text-gray-600 italic mb-4">“Booking a car took less than 5 minutes. Super smooth experience!”</p>
-                    <h4 class="font-semibold text-blue-800">— Sarah K.</h4>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-md">
-                    <p class="text-gray-600 italic mb-4">“Loved the SUV we got for our trip to Naivasha. Host was friendly and professional.”</p>
-                    <h4 class="font-semibold text-blue-800">— James M.</h4>
-                </div>
-                <div class="bg-white p-6 rounded-2xl shadow-md">
-                    <p class="text-gray-600 italic mb-4">“24/7 support actually works! They helped me quickly when I had a query.”</p>
-                    <h4 class="font-semibold text-blue-800">— Anita W.</h4>
-                </div>
-            </div>
+        <div class="border rounded-lg">
+          <button class="w-full flex justify-between items-center px-4 py-3 text-left font-semibold text-blue-800 faq-toggle">
+            Do I need insurance? <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="accordion-content px-4 pb-3 text-gray-600">Yes, all cars listed on GlideX must have valid insurance before renting.</div>
         </div>
-    </section>
-
-    <section class="bg-blue-50 py-16 md:py-24">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-4">Our Most Popular Cars</h2>
-            <p class="text-lg text-gray-600 mb-12 max-w-2xl mx-auto">Check out some of the top-rated vehicles available for rent on GlideX.</p>
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:scale-105 hover:shadow-2xl transition">
-                    <img src="https://placehold.co/800x500/0c4a6e/ffffff?text=Luxury+Sedan" alt="Luxury sedan for hire in Nairobi" class="w-full h-52 object-cover">
-                    <div class="p-6 text-left">
-                        <h3 class="text-xl font-semibold text-blue-900">Luxury Sedan</h3>
-                        <p class="text-gray-500 mt-1 mb-4">Perfect for business trips or a weekend getaway.</p>
-                        <div class="flex justify-between items-center mt-4">
-                            <span class="text-2xl font-bold text-blue-600">KES 12,000<span class="text-base text-gray-400 font-normal">/day</span></span>
-                            <a href="#" class="bg-blue-600 text-white py-2 px-6 rounded-full hover:bg-blue-700 transition">Book Now</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:scale-105 hover:shadow-2xl transition">
-                    <img src="https://placehold.co/800x500/0c4a6e/ffffff?text=Spacious+SUV" alt="Spacious SUV for family trips" class="w-full h-52 object-cover">
-                    <div class="p-6 text-left">
-                        <h3 class="text-xl font-semibold text-blue-900">Spacious SUV</h3>
-                        <p class="text-gray-500 mt-1 mb-4">Ideal for family road trips or group adventures.</p>
-                        <div class="flex justify-between items-center mt-4">
-                            <span class="text-2xl font-bold text-blue-600">KES 15,000<span class="text-base text-gray-400 font-normal">/day</span></span>
-                            <a href="#" class="bg-blue-600 text-white py-2 px-6 rounded-full hover:bg-blue-700 transition">Book Now</a>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-white rounded-xl shadow-lg overflow-hidden hover:scale-105 hover:shadow-2xl transition">
-                    <img src="https://placehold.co/800x500/0c4a6e/ffffff?text=Sport+Convertible" alt="Sport convertible for thrilling drives" class="w-full h-52 object-cover">
-                    <div class="p-6 text-left">
-                        <h3 class="text-xl font-semibold text-blue-900">Sport Convertible</h3>
-                        <p class="text-gray-500 mt-1 mb-4">Experience the thrill of the open road.</p>
-                        <div class="flex justify-between items-center mt-4">
-                            <span class="text-2xl font-bold text-blue-600">KES 18,000<span class="text-base text-gray-400 font-normal">/day</span></span>
-                            <a href="#" class="bg-blue-600 text-white py-2 px-6 rounded-full hover:bg-blue-700 transition">Book Now</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="border rounded-lg">
+          <button class="w-full flex justify-between items-center px-4 py-3 text-left font-semibold text-blue-800 faq-toggle">
+            What if I need to cancel? <i class="fas fa-chevron-down"></i>
+          </button>
+          <div class="accordion-content px-4 pb-3 text-gray-600">You can cancel directly in the app. Refunds vary by timing according to our policy.</div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 
-    <section class="bg-white py-16 md:py-24">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-4">Frequently Asked Questions</h2>
-            <div class="max-w-3xl mx-auto text-left space-y-6">
-                <div>
-                    <h3 class="font-semibold text-blue-800">How do I book a car?</h3>
-                    <p class="text-gray-600">Simply browse available cars, choose your preferred vehicle, and confirm payment instantly through the app.</p>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-blue-800">Do I need insurance?</h3>
-                    <p class="text-gray-600">Yes, insurance is mandatory. GlideX ensures all cars listed have valid insurance before they’re available.</p>
-                </div>
-                <div>
-                    <h3 class="font-semibold text-blue-800">What if I need to cancel?</h3>
-                    <p class="text-gray-600">You can cancel through the app. Refunds depend on how soon before the rental you cancel, following our refund policy.</p>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <section id="contact" class="bg-gray-100 py-16 md:py-24">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-4">Get In Touch</h2>
-            <p class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto">
-                Have a question? Connect with us via email or social media.
-            </p>
-            
-            <div class="flex flex-col md:flex-row justify-center items-center gap-6">
-                
-                <div class="flex items-center space-x-2">
-                    <i class="fas fa-envelope text-blue-600 text-xl" aria-hidden="true"></i>
-                    <a href="mailto:support@glidexp.com" class="text-blue-600 text-xl font-semibold hover:underline">
-                        support@glidexp.com
-                    </a>
-                </div>
-                
-                <div class="flex items-center space-x-6">
-                    <a href="https://instagram.com/glide_xp" target="_blank"
-                       class="transition-transform transform hover:scale-110" aria-label="Follow us on Instagram">
-                        <i class="fab fa-instagram text-3xl"
-                           style="background: radial-gradient(circle at 30% 30%, #fdf497, #fd5949, #d6249f, #285AEB);
-                                  -webkit-background-clip: text;
-                                  -webkit-text-fill-color: transparent;" aria-hidden="true">
-                        </i>
-                    </a>
-
-                    <a href="https://tiktok.com/@glide_x4" target="_blank"
-                       class="transition-transform transform hover:scale-110" aria-label="Follow us on TikTok">
-                        <i class="fab fa-tiktok text-3xl"
-                           style="color: #000;
-                                  text-shadow: -2px -2px 0 #25F4EE, 2px 2px 0 #FE2C55;" aria-hidden="true">
-                        </i>
-                    </a>
-
-                    <a href="https://x.com/GlideXpp" target="_blank"
-                       class="transition-transform transform hover:scale-110" aria-label="Follow us on X (Twitter)">
-                        <i class="fab fa-x-twitter text-3xl text-black" aria-hidden="true"></i>
-                    </a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <footer class="bg-blue-900 text-white py-8">
-        <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p>&copy; 2024 GlideX. All rights reserved.</p>
-        </div>
-    </footer>
-
-    <script>
-        const menuBtn = document.getElementById('menuBtn');
-        const mobileMenu = document.getElementById('mobileMenu');
-        
-        menuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-    </script>
-</body>
-</html>
+  <!-- CONTACT -->
+  <section id="contact" class="bg-gray-100 py-16 md:py-24">
+    <div class="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <h2 class="text-3xl sm:text-4xl font-bold text-blue-900 mb-4">Get In Touch</h2>
+      <p class="text-lg text-gray-600 mb-8">Questions? Reach us anytime.</p>
+      <form class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md space-y-4">
+        <input type="text" placeholder="Your Name" class="w-full border rounded-lg px-4 py-2 focus:ring focus:ring-blue-300">
+        <input type="email" placeholder="Your Email" class="w-full border rounded-lg px-4 py-2 focus:ring focus:ring-blue-300">
+        <textarea rows="4" placeholder="Your Message" class="w-full border rounded-lg px-4 py-2 focus:ring focus:ring-blue-300"></textarea>
+        <button type="submit" class="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition">Send Message</button>
+      </form>
+      <div class="flex justify
