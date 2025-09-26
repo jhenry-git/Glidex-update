@@ -7,33 +7,67 @@
   <link rel="stylesheet" href="styles.css">
   <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { text-align: center; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    th { background: #f4f4f4; }
-    .error { color: red; }
-    .loading { color: gray; }
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
+    h1 { text-align: center; margin-bottom: 20px; }
+    #status { text-align: center; margin-bottom: 20px; }
+    
+    .car-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .car-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease;
+    }
+    .car-card:hover {
+      transform: translateY(-5px);
+    }
+    .car-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+    .car-info {
+      padding: 15px;
+      flex-grow: 1;
+    }
+    .car-info h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      color: #333;
+    }
+    .car-info p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #555;
+    }
+    .rent-button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 16px;
+      border-top: 1px solid #eee;
+      transition: background 0.2s ease;
+    }
+    .rent-button:hover {
+      background: #0056b3;
+    }
   </style>
 </head>
 <body>
   <h1>GlideX - Available Cars</h1>
   <p id="status" class="loading">Loading cars...</p>
 
-  <table id="carsTable" style="display:none;">
-    <thead>
-      <tr>
-        <th>Name</th>
-        <th>Status</th>
-        <th>Price (KES)</th>
-        <th>Seats</th>
-        <th>Year</th>
-        <th>Available</th>
-        <th>Image</th>
-      </tr>
-    </thead>
-    <tbody id="carsBody"></tbody>
-  </table>
+  <div id="carList" class="car-list"></div>
 
   <script>
     // --- Supabase Config ---
@@ -43,14 +77,13 @@
 
     async function fetchCars() {
       const statusEl = document.getElementById("status");
-      const table = document.getElementById("carsTable");
-      const tbody = document.getElementById("carsBody");
+      const carList = document.getElementById("carList");
 
       statusEl.textContent = "Loading cars...";
 
       let { data: cars, error } = await supabase
         .from("cars")
-        .select("*") // get all columns first, you can narrow down later
+        .select("*")
         .limit(20);
 
       if (error) {
@@ -67,26 +100,40 @@
 
       // Clear loading text
       statusEl.style.display = "none";
-      table.style.display = "table";
 
       cars.forEach(car => {
-        let row = document.createElement("tr");
+        let imageSrc = "promo.png"; // fallback image
+        if (car.image_urls) {
+          try {
+            if (typeof car.image_urls === "string") {
+              const parsed = JSON.parse(car.image_urls);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                imageSrc = parsed[0];
+              } else {
+                imageSrc = car.image_urls;
+              }
+            } else if (Array.isArray(car.image_urls)) {
+              imageSrc = car.image_urls[0];
+            }
+          } catch (e) {
+            imageSrc = car.image_urls;
+          }
+        }
 
-        // Adjust column names to match your table
-        row.innerHTML = `
-          <td>${car.name || "-"}</td>
-          <td>${car.status || "Available"}</td>
-          <td>${car.price || 0}</td>
-          <td>${car.seats || "-"}</td>
-          <td>${car.year || "-"}</td>
-          <td>${car.available ? "✅" : "❌"}</td>
-          <td>
-            ${car.image_urls 
-              ? `<img src="${Array.isArray(car.image_urls) ? car.image_urls[0] : car.image_urls}" alt="car" width="80">` 
-              : "No image"}
-          </td>
+        const carCard = document.createElement("div");
+        carCard.className = "car-card";
+        carCard.innerHTML = `
+          <img src="${imageSrc}" alt="${car.name || "Car"}" class="car-image">
+          <div class="car-info">
+            <h3>${car.name || "Unnamed Car"}</h3>
+            <p>Status: ${car.status || "Available"}</p>
+            <p>Price: KES ${car.price || 0}/day</p>
+            <p>Seats: ${car.seats || "-"}</p>
+            <p>Year: ${car.year || "-"}</p>
+          </div>
+          <button class="rent-button">Rent Now</button>
         `;
-        tbody.appendChild(row);
+        carList.appendChild(carCard);
       });
     }
 
