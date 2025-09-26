@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - GlideX</title>
+    <title>Dashboard - Glidexp</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -28,7 +28,7 @@
     </main>
 
     <footer class="dashboard-footer">
-        <p>&copy; 2025 GlideX</p>
+        <p>&copy; 2025 Glidexp</p>
     </footer>
 
     <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
@@ -62,9 +62,7 @@
             carListContainer.innerHTML = '<p class="loading-message">Loading available cars...</p>';
 
             try {
-                // The provided table structure is generic. This query uses aliases to match your HTML,
-                // assuming your columns are named `name` (for model), `status`, `price`, and `image_urls`.
-                // If the names are different, you'll need to update the .select() part.
+                // Query Supabase with aliases to match your HTML template.
                 const { data: cars, error } = await supabase
                     .from("cars")
                     .select("name, status, price, image_urls");
@@ -82,7 +80,7 @@
                         if (Array.isArray(car.image_urls) && car.image_urls.length > 0) {
                             imageSrc = car.image_urls[0]; // Use the first URL in the array
                         } else if (typeof car.image_urls === "string" && car.image_urls.trim() !== "") {
-                             imageSrc = car.image_urls; // Use the URL if it's a string
+                            imageSrc = car.image_urls; // Use the URL if it's a string
                         }
 
                         const carCard = `
