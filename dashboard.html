@@ -1,111 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard - Glidexp</title>
-    <link rel="stylesheet" href="styles.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GlideX Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; }
+    h1 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background: #f4f4f4; }
+    .error { color: red; }
+    .loading { color: gray; }
+  </style>
 </head>
-<body class="dashboard-body">
+<body>
+  <h1>GlideX - Available Cars</h1>
+  <p id="status" class="loading">Loading cars...</p>
 
-    <header class="dashboard-header">
-        <img src="logo.png" alt="Glidexp Logo" class="logo">
-        <h1 class="welcome-text">Welcome to GlideX!</h1>
-        <nav class="dashboard-nav">
-            <a href="#">Account</a>
-            <a href="#" id="logoutButton">Logout</a>
-        </nav>
-    </header>
+  <table id="carsTable" style="display:none;">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Status</th>
+        <th>Price (KES)</th>
+        <th>Seats</th>
+        <th>Year</th>
+        <th>Available</th>
+        <th>Image</th>
+      </tr>
+    </thead>
+    <tbody id="carsBody"></tbody>
+  </table>
 
-    <main class="dashboard-main">
-        <section class="car-list-section">
-            <h2 class="section-title">Available Cars for Rent</h2>
-            <div class="car-list" id="car-list">
-                <p class="loading-message">Loading available cars...</p>
-            </div>
-        </section>
-    </main>
+  <script>
+    // --- Supabase Config ---
+    const SUPABASE_URL = "https://mxzzsqpqblbzudrlhvjz.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14enpzcXBxYmxienVkcmxodmp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyMDU5NzAsImV4cCI6MjA2NDc4MTk3MH0.OGXHbp-5zn2bETy09eALL3X0QMYsl4YTXb-aaW0tFt0";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    <footer class="dashboard-footer">
-        <p>&copy; 2025 Glidexp</p>
-    </footer>
+    async function fetchCars() {
+      const statusEl = document.getElementById("status");
+      const table = document.getElementById("carsTable");
+      const tbody = document.getElementById("carsBody");
 
-    <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
-    <script>
-        // Initialize Supabase
-        const SUPABASE_URL = "https://mxzzsqpqblbzudrlhvjz.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14enpzcXBxYmxienVkcmxodmp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyMDU5NzAsImV4cCI6MjA2NDc4MTk3MH0.OGXHbp-5zn2bETy09eALL3X0QMYsl4YTXb-aaW0tFt0";
-        const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+      statusEl.textContent = "Loading cars...";
 
-        // --- Logout Functionality ---
-        const logoutButton = document.getElementById('logoutButton');
+      let { data: cars, error } = await supabase
+        .from("cars")
+        .select("*") // get all columns first, you can narrow down later
+        .limit(20);
 
-        async function signOut() {
-            const { error } = await supabase.auth.signOut();
-            if (error) {
-                console.error('Error logging out:', error.message);
-            } else {
-                // Redirect to the login page or home page after successful logout
-                window.location.href = 'login.html';
-            }
-        }
+      if (error) {
+        console.error("Error fetching cars:", error);
+        statusEl.textContent = "❌ Error loading cars.";
+        statusEl.className = "error";
+        return;
+      }
 
-        logoutButton.addEventListener('click', (e) => {
-            e.preventDefault();
-            signOut();
-        });
+      if (!cars || cars.length === 0) {
+        statusEl.textContent = "No cars found.";
+        return;
+      }
 
-        // --- Fetch Cars Functionality ---
-        async function fetchCars() {
-            const carListContainer = document.getElementById("car-list");
-            carListContainer.innerHTML = '<p class="loading-message">Loading available cars...</p>';
+      // Clear loading text
+      statusEl.style.display = "none";
+      table.style.display = "table";
 
-            try {
-                // Query Supabase with aliases to match your HTML template.
-                const { data: cars, error } = await supabase
-                    .from("cars")
-                    .select("name, status, price, image_urls");
+      cars.forEach(car => {
+        let row = document.createElement("tr");
 
-                if (error) {
-                    console.error("Supabase query error:", error.message);
-                    throw error;
-                }
+        // Adjust column names to match your table
+        row.innerHTML = `
+          <td>${car.name || "-"}</td>
+          <td>${car.status || "Available"}</td>
+          <td>${car.price || 0}</td>
+          <td>${car.seats || "-"}</td>
+          <td>${car.year || "-"}</td>
+          <td>${car.available ? "✅" : "❌"}</td>
+          <td>
+            ${car.image_urls 
+              ? `<img src="${Array.isArray(car.image_urls) ? car.image_urls[0] : car.image_urls}" alt="car" width="80">` 
+              : "No image"}
+          </td>
+        `;
+        tbody.appendChild(row);
+      });
+    }
 
-                if (cars && cars.length > 0) {
-                    carListContainer.innerHTML = "";
-                    cars.forEach((car) => {
-                        // Handle image_urls which is a JSONB array or string
-                        let imageSrc = "promo.png"; // Default image
-                        if (Array.isArray(car.image_urls) && car.image_urls.length > 0) {
-                            imageSrc = car.image_urls[0]; // Use the first URL in the array
-                        } else if (typeof car.image_urls === "string" && car.image_urls.trim() !== "") {
-                            imageSrc = car.image_urls; // Use the URL if it's a string
-                        }
-
-                        const carCard = `
-                            <div class="car-card">
-                                <img src="${imageSrc}" alt="${car.name} image" class="car-image">
-                                <div class="car-info">
-                                    <h3 class="car-model">${car.name}</h3>
-                                    <p class="car-status">Status: <span>${car.status || "Available"}</span></p>
-                                    <p class="car-price">Price: KES ${car.price || "0"}/day</p>
-                                </div>
-                                <button class="rent-button">Rent Now</button>
-                            </div>
-                        `;
-                        carListContainer.innerHTML += carCard;
-                    });
-                } else {
-                    carListContainer.innerHTML = '<p class="no-cars-message">No cars are currently available. Please check back later!</p>';
-                }
-            } catch (err) {
-                console.error("Failed to fetch cars:", err);
-                carListContainer.innerHTML = '<p class="error-message">Error loading cars. Please try again later.</p>';
-            }
-        }
-
-        document.addEventListener("DOMContentLoaded", fetchCars);
-    </script>
+    document.addEventListener("DOMContentLoaded", fetchCars);
+  </script>
 </body>
 </html>
