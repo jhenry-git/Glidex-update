@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - GlideX</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-body">
+
+  <header class="login-header">
+    <img src="logo.png" alt="Glidexp Logo" class="logo">
+  </header>
+
+  <main class="login-main">
+    <div class="login-card">
+      <h2>Welcome Back to GlideX</h2>
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="username">Email</label>
+          <input type="email" id="username" name="username" required>
+        </div>
+        <div class="form-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" name="password" required>
+        </div>
+        <button type="submit" class="login-button">Log In</button>
+      </form>
+      <p class="login-links">
+        <a href="reset-password.html">Forgot Password?</a>
+        <span>&nbsp;|&nbsp;</span>
+        <a href="signup.html">Sign Up</a>
+      </p>
+      <p id="errorMsg" style="color: red; margin-top: 10px;"></p>
+    </div>
+  </main>
+
+  <footer class="login-footer">
+    <p>&copy; 2025 GlideX. All rights reserved.</p>
+  </footer>
+
+  <!-- Supabase client -->
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script>
+    // Replace with your actual Supabase credentials
+    const SUPABASE_URL = "https://mxzzsqpqblbzudrlhvjz.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14enpzcXBxYmxienVkcmxodmp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyMDU5NzAsImV4cCI6MjA2NDc4MTk3MH0.OGXHbp-5zn2bETy09eALL3X0QMYsl4YTXb-aaW0tFt0";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    document.getElementById("loginForm").addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const email = document.getElementById("username").value;
+      const password = document.getElementById("password").value;
+      const errorMsg = document.getElementById("errorMsg");
+
+      errorMsg.textContent = ""; // clear old errors
+
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+
+      if (error) {
+        errorMsg.textContent = error.message;
+      } else {
+        // Save session so user stays logged in
+        localStorage.setItem("supabaseSession", JSON.stringify(data.session));
+        window.location.href = "dashboard.html"; // redirect
+      }
+    });
+  </script>
+
+</body>
+</html>
