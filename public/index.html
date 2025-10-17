@@ -5,10 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GlideX – Rent, Host & Chauffeur Cars in Kenya</title>
     
-    <link rel="icon" href="favicon.png" type="image/png">
-    <link rel="apple-touch-icon" href="favicon.png">
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="alternate icon" href="/favicon.ico" sizes="any">
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+    <link rel="manifest" href="/site.webmanifest">
     <meta name="theme-color" content="#1d4ed8">
-    
     <meta name="geo.position" content="-1.2921;36.8219">
     <meta name="ICBM" content="-1.2921, 36.8219">
     <meta name="geo.placename" content="Nairobi, Kenya">
@@ -192,11 +193,52 @@
         .card-hover:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(0, 0, 0, 0.08), 0 5px 10px rgba(0, 0, 0, 0.05); }
         .book-button-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+
+        /* --- NEW STYLES FOR VIDEO BACKGROUND --- */
+
+        /* 🔹 Fullscreen video positioning */
+        #bg-video {
+          position: fixed;
+          top: 0;
+          left: 0;
+          width: 100vw;
+          height: 100vh;
+          object-fit: cover;
+          z-index: -1;
+          filter: brightness(65%) contrast(105%);
+          /* Fade-in effect */
+          opacity: 0;
+          animation: fadeInVideo 2s ease forwards;
+        }
+        
+        @keyframes fadeInVideo {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+
+        /* 🔹 Overlay text positioning */
+        .overlay-content {
+          position: relative;
+          z-index: 1;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          height: 100vh;
+          text-align: center;
+          color: white;
+          background: rgba(0, 0, 0, 0.3); /* subtle transparent overlay */
+        }
     </style>
 </head>
 <body class="bg-blue-50 text-gray-800">
 
-    <header class="bg-white shadow-sm sticky top-0 z-50">
+    <video autoplay loop muted playsinline id="bg-video">
+      <source src="promo.mp4" type="video/mp4">
+      Your browser does not support the video tag.
+    </video>
+
+    <header class="bg-white/80 backdrop-blur-sm shadow-sm sticky top-0 z-50">
         <div class="container mx-auto px-4 sm:px-6 lg:px-8 py-3 flex justify-between items-center">
             <a href="#" class="flex items-center space-x-2">
                 <img src="logo.png" alt="GlideX Car Rental Logo" class="h-8" onerror="this.src='https://placehold.co/32x32/1d4ed8/ffffff?text=GX'">
@@ -224,27 +266,24 @@
         </div>
     </header>
 
-    <section class="relative bg-gradient-to-b from-white via-blue-50 to-white py-16 px-6 md:px-12">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center gap-12">
-            <div class="md:w-1/2 text-center md:text-left">
-                <p class="text-sm uppercase tracking-widest text-blue-600 font-semibold mb-3">Drive Your Dreams</p>
+    <section class="overlay-content px-6 md:px-12">
+        <div class="max-w-7xl mx-auto">
+            <div class="text-center">
+                <p class="text-sm uppercase tracking-widest text-blue-300 font-semibold mb-3">Drive Your Dreams</p>
                 <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold leading-tight mb-6">
-                    Your Next <span class="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-400">Adventure</span> <br class="hidden lg:inline"> Starts Here
+                    Your Next <span class="text-blue-300">Adventure</span> <br class="hidden lg:inline"> Starts Here
                 </h1>
-                <p class="text-lg text-gray-700 mb-8 max-w-lg mx-auto md:mx-0 leading-relaxed">
-                    Book <span class="font-semibold text-blue-600">instantly</span>, connect with <span class="font-semibold">verified hosts</span>, and enjoy a <span class="font-semibold">seamless rental</span> across Kenya. Rent cars in Nairobi, Mombasa, Kisumu, and more with trusted chauffeur services.
+                <p class="text-lg text-gray-200 mb-8 max-w-lg mx-auto leading-relaxed">
+                    Book <span class="font-semibold text-white">instantly</span>, connect with <span class="font-semibold">verified hosts</span>, and enjoy a <span class="font-semibold">seamless rental</span> across Kenya. Rent cars in Nairobi, Mombasa, Kisumu, and more with trusted chauffeur services.
                 </p>
-                <div class="flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                <div class="flex flex-col sm:flex-row gap-4 justify-center">
                     <a href="dashboard.html" class="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-semibold shadow-lg transition book-button-pulse">🚗 Book Now</a>
-                    <a href="#learn-more" class="px-6 py-3 border border-blue-600 text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition">Learn More</a>
+                    <a href="#features" class="px-6 py-3 border border-white text-white rounded-lg font-semibold hover:bg-white hover:text-blue-700 transition">Learn More</a>
                 </div>
-                <div class="flex flex-row gap-3 justify-center md:justify-start mt-6">
+                <div class="flex flex-row gap-3 justify-center mt-6">
                     <a href="https://apps.apple.com/ke/app/glidex/id6751563258" target="_blank" class="book-button-pulse"><img src="https://developer.apple.com/assets/elements/badges/download-on-the-app-store.svg" alt="Download GlideX on App Store" class="h-10"></a>
                     <a href="https://play.google.com/store/apps/details?id=com.anonymous.GlideX" target="_blank" class="book-button-pulse"><img src="https://upload.wikimedia.org/wikipedia/commons/7/78/Google_Play_Store_badge_EN.svg" alt="Download GlideX on Google Play" class="h-10"></a>
                 </div>
-            </div>
-            <div class="md:w-1/2 flex justify-center">
-                <img src="promo.png" alt="A classic silver sedan parked on a street" class="rounded-xl shadow-xl border border-gray-200">
             </div>
         </div>
     </section>
