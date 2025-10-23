@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GlideX Dashboard</title>
+  <script src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 20px; background: #f8f9fa; }
+    h1 { text-align: center; margin-bottom: 20px; }
+    #status { text-align: center; margin-bottom: 20px; }
+    
+    .car-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .car-card {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s ease;
+    }
+    .car-card:hover {
+      transform: translateY(-5px);
+    }
+    .car-image {
+      width: 100%;
+      height: 180px;
+      object-fit: cover;
+    }
+    .car-info {
+      padding: 15px;
+      flex-grow: 1;
+    }
+    .car-info h3 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      color: #333;
+    }
+    .car-info p {
+      margin: 5px 0;
+      font-size: 14px;
+      color: #555;
+    }
+    .rent-button {
+      background: #007bff;
+      color: white;
+      border: none;
+      padding: 10px;
+      width: 100%;
+      cursor: pointer;
+      font-size: 16px;
+      border-top: 1px solid #eee;
+      transition: background 0.2s ease;
+    }
+    .rent-button:hover {
+      background: #0056b3;
+    }
+  </style>
+</head>
+<body>
+  <h1>GlideX - Available Cars</h1>
+  <p id="status" class="loading">Loading cars...</p>
+
+  <div id="carList" class="car-list"></div>
+
+  <script>
+    // --- Supabase Config ---
+    const SUPABASE_URL = "https://mxzzsqpqblbzudrlhvjz.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im14enpzcXBxYmxienVkcmxodmp6Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDkyMDU5NzAsImV4cCI6MjA2NDc4MTk3MH0.OGXHbp-5zn2bETy09eALL3X0QMYsl4YTXb-aaW0tFt0";
+    const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // --- App Store Links ---
+    const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=com.anonymous.GlideX";
+    const APP_STORE_URL = "https://apps.apple.com/ke/app/glidex/id6751563258";
+
+    // Device detection
+    function getStoreLink() {
+      const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+
+      if (/android/i.test(userAgent)) {
+        return PLAY_STORE_URL;
+      }
+      if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+        return APP_STORE_URL;
+      }
+      // fallback (desktop users etc.)
+      return "https://glidexp.com"; 
+    }
+
+    function redirectToStore() {
+      window.open(getStoreLink(), "_blank");
+    }
+
+    async function fetchCars() {
+      const statusEl = document.getElementById("status");
+      const carList = document.getElementById("carList");
+
+      statusEl.textContent = "Loading cars...";
+
+      let { data: cars, error } = await supabase
+        .from("cars")
+        .select("*")
+        .limit(20);
+
+      if (error) {
+        console.error("Error fetching cars:", error);
+        statusEl.textContent = "❌ Error loading cars.";
+        statusEl.className = "error";
+        return;
+      }
+
+      if (!cars || cars.length === 0) {
+        statusEl.textContent = "No cars found.";
+        return;
+      }
+
+      statusEl.style.display = "none";
+
+      cars.forEach(car => {
+        let imageSrc = "promo.png"; // fallback image
+        if (car.image_urls) {
+          try {
+            if (typeof car.image_urls === "string") {
+              const parsed = JSON.parse(car.image_urls);
+              if (Array.isArray(parsed) && parsed.length > 0) {
+                imageSrc = parsed[0];
+              } else {
+                imageSrc = car.image_urls;
+              }
+            } else if (Array.isArray(car.image_urls)) {
+              imageSrc = car.image_urls[0];
+            }
+          } catch (e) {
+            imageSrc = car.image_urls;
+          }
+        }
+
+        const carCard = document.createElement("div");
+        carCard.className = "car-card";
+        carCard.innerHTML = `
+          <img src="${imageSrc}" alt="${car.name || "Car"}" class="car-image">
+          <div class="car-info">
+            <h3>${car.name || "Unnamed Car"}</h3>
+            <p>Status: ${car.status || "Available"}</p>
+            <p>Price: KES ${car.price || 0}/day</p>
+            <p>Seats: ${car.seats || "-"}</p>
+            <p>Year: ${car.year || "-"}</p>
+          </div>
+          <button class="rent-button" onclick="redirectToStore()">Rent Now</button>
+        `;
+        carList.appendChild(carCard);
+      });
+    }
+
+    document.addEventListener("DOMContentLoaded", fetchCars);
+  </script>
+</body>
+</html>
