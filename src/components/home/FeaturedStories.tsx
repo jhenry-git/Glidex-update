@@ -62,7 +62,7 @@ export const FeaturedStories: React.FC<FeaturedStoriesProps> = ({ cars }) => {
                     initial={{ opacity: 0 }}
                     whileInView={{ opacity: 1 }}
                     viewport={{ once: true }}
-                    onClick={() => navigate('/search')}
+                    onClick={() => navigate('/listings')}
                     className="hidden md:flex items-center gap-3 text-brand-black font-medium hover:text-brand-blue transition-colors group pb-2"
                 >
                     <span className="text-micro font-bold">View all vehicles</span>
@@ -88,7 +88,7 @@ export const FeaturedStories: React.FC<FeaturedStoriesProps> = ({ cars }) => {
                                     transition={{ duration: 0.8, ease: "easeOut" }}
                                     className={`w-[85vw] md:w-[48vw] max-w-[600px] aspect-square rounded-full overflow-hidden circle-image z-[2] relative ${isEven ? 'md:-mr-[12%]' : 'md:-ml-[12%]'}`}
                                 >
-                                    <img src={story.image} alt={story.title} className="w-full h-full object-cover" />
+                                    <img src={story.image} alt={story.title} className="w-full h-full object-cover" loading="lazy" />
                                 </motion.div>
 
                                 {/* Overlapping Card */}
@@ -121,7 +121,7 @@ export const FeaturedStories: React.FC<FeaturedStoriesProps> = ({ cars }) => {
                                             <span className="text-sm font-sans text-brand-black font-bold">{carName}</span>
                                         </div>
                                         <div className="flex flex-col sm:flex-row gap-3 mt-2">
-                                            <button onClick={() => navigate('/cars')} className="btn-primary flex-1 text-sm py-3.5 px-0 w-full sm:w-auto shadow-sm">
+                                            <button onClick={() => navigate('/listings')} className="btn-primary flex-1 text-sm py-3.5 px-0 w-full sm:w-auto shadow-sm">
                                                 Book Instantly
                                             </button>
                                             <button onClick={() => navigate('/stories')} className="btn-secondary flex-1 text-sm py-3.5 px-0 w-full sm:w-auto">
@@ -138,7 +138,7 @@ export const FeaturedStories: React.FC<FeaturedStoriesProps> = ({ cars }) => {
 
             <div className="flex justify-center mt-16 md:hidden">
                 <button
-                    onClick={() => navigate('/search')}
+                    onClick={() => navigate('/listings')}
                     className="flex items-center gap-3 text-brand-black font-medium transition-colors group"
                 >
                     <span className="text-micro font-bold">View all vehicles</span>

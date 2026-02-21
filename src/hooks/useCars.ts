@@ -30,7 +30,7 @@ export function useCars(options?: { startDate?: string; endDate?: string }) {
         } finally {
             setLoading(false);
         }
-    }, [options?.startDate, options?.endDate]);
+    }, [options]);
 
     useEffect(() => {
         loadCars();

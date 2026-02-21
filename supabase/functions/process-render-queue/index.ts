@@ -107,6 +107,7 @@ Deno.serve(async (req) => {
 
         // 4. Determine render configuration
         const renderConfig = getRenderConfig(renderJob.render_type);
+        console.log(`[Render] Picked config for ${renderJob.render_type}:`, renderConfig.compositionId);
 
         // 5. Attempt render
         //    In production: invoke Remotion Lambda

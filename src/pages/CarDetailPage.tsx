@@ -48,6 +48,24 @@ export default function CarDetailPage() {
                 image: car.image_urls?.[0],
                 video: ogVideoUrl ?? undefined,
                 type: 'product',
+                structuredData: {
+                    "@context": "https://schema.org",
+                    "@type": "Car",
+                    "name": `${car.brand} ${car.model}`,
+                    "description": car.description,
+                    "image": car.image_urls?.[0],
+                    "brand": {
+                        "@type": "Brand",
+                        "name": car.brand
+                    },
+                    "offers": {
+                        "@type": "Offer",
+                        "priceCurrency": "KES",
+                        "price": car.price,
+                        "availability": "https://schema.org/InStock",
+                        "url": window.location.href
+                    }
+                }
             }
             : null
     );

@@ -1,29 +1,38 @@
 import React, { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 
+declare global {
+    interface Window {
+        opera?: unknown;
+        MSStream?: unknown;
+    }
+}
+
 export const SmartAppBanner: React.FC = () => {
     const [isVisible, setIsVisible] = useState(false);
     const [os, setOs] = useState<'ios' | 'android' | 'other'>('other');
 
     useEffect(() => {
-        const isDismissed = localStorage.getItem('glidex-app-banner-dismissed');
+        Promise.resolve().then(() => {
+            const isDismissed = localStorage.getItem('glidex-app-banner-dismissed');
 
-        // Detect OS
-        const userAgent = navigator.userAgent || window.opera;
-        let detectedOs: 'ios' | 'android' | 'other' = 'other';
+            // Detect OS
+            const userAgent = navigator.userAgent || window.opera;
+            let detectedOs: 'ios' | 'android' | 'other' = 'other';
 
-        if (/android/i.test(userAgent)) {
-            detectedOs = 'android';
-        } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
-            detectedOs = 'ios';
-        }
+            if (/android/i.test(userAgent as string)) {
+                detectedOs = 'android';
+            } else if (/iPad|iPhone|iPod/.test(userAgent as string) && !window.MSStream) {
+                detectedOs = 'ios';
+            }
 
-        setOs(detectedOs);
+            setOs(detectedOs);
 
-        // Only show if it's a mobile device and hasn't been dismissed
-        if (!isDismissed && (detectedOs === 'ios' || detectedOs === 'android')) {
-            setIsVisible(true);
-        }
+            // Only show if it's a mobile device and hasn't been dismissed
+            if (!isDismissed && (detectedOs === 'ios' || detectedOs === 'android')) {
+                setIsVisible(true);
+            }
+        });
     }, []);
 
     const handleDismiss = () => {

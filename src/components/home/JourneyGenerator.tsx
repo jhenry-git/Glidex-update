@@ -206,7 +206,7 @@ export const JourneyGenerator: React.FC = () => {
 
                                 <div className="flex items-center gap-4">
                                     <button
-                                        onClick={() => navigate('/search')}
+                                        onClick={() => navigate('/listings')}
                                         className="px-6 py-3 bg-white text-black font-sans text-sm tracking-widest uppercase hover:bg-sand-200 transition-colors flex items-center gap-2"
                                     >
                                         Find Vehicles <ArrowRight className="w-4 h-4" />

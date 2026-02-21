@@ -1,4 +1,3 @@
-// @ts-nocheck — Remotion CJS types incompatible with tsc bundler resolution.
 /**
  * HostOnboardingComposition — Personalized welcome video for new hosts.
  *
@@ -9,14 +8,8 @@
  * 1920 × 1080, 18 seconds at 30fps
  */
 
-import {
-    AbsoluteFill,
-    Sequence,
-    useCurrentFrame,
-    useVideoConfig,
-    interpolate,
-    spring,
-} from 'remotion';
+// @ts-expect-error TypeScript cannot resolve Remotion CJS types with bundler module resolution
+import { AbsoluteFill, Sequence, useCurrentFrame, useVideoConfig, interpolate, spring } from 'remotion';
 
 // === CONFIG ===
 const FPS = 30;
@@ -461,10 +454,5 @@ export const HostOnboardingComposition: React.FC<HostOnboardingProps> = ({
         </AbsoluteFill>
     );
 };
-
-export const HOST_ONBOARDING_DURATION = TOTAL_DURATION;
-export const HOST_ONBOARDING_FPS = FPS;
-export const HOST_ONBOARDING_WIDTH = 1920;
-export const HOST_ONBOARDING_HEIGHT = 1080;
 
 export default HostOnboardingComposition;

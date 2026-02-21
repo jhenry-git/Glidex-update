@@ -1,4 +1,3 @@
-// @ts-nocheck — Remotion CJS types incompatible with tsc bundler resolution.
 /**
  * SocialReelComposition — Vertical 9:16 reel for Instagram/TikTok.
  *
@@ -10,15 +9,8 @@
  * - 12 seconds at 30fps
  */
 
-import {
-    AbsoluteFill,
-    Sequence,
-    Img,
-    useCurrentFrame,
-    useVideoConfig,
-    interpolate,
-    spring,
-} from 'remotion';
+// @ts-expect-error TypeScript cannot resolve Remotion CJS types with bundler module resolution
+import { AbsoluteFill, Sequence, Img, useCurrentFrame, useVideoConfig, interpolate, spring } from 'remotion';
 import type { FormattedCar } from '@/types';
 
 // === CONFIG ===
@@ -470,10 +462,5 @@ export const SocialReelComposition: React.FC<SocialReelProps> = ({ car }) => {
         </AbsoluteFill>
     );
 };
-
-export const SOCIAL_REEL_DURATION = TOTAL_DURATION;
-export const SOCIAL_REEL_FPS = FPS;
-export const SOCIAL_REEL_WIDTH = 1080;
-export const SOCIAL_REEL_HEIGHT = 1920;
 
 export default SocialReelComposition;

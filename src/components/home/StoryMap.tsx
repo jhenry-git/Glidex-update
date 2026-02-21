@@ -72,7 +72,7 @@ export const StoryMap: React.FC = () => {
                             </p>
 
                             <button
-                                onClick={() => navigate('/search')}
+                                onClick={() => navigate('/listings')}
                                 className="px-8 py-4 bg-safari-green-700 hover:bg-safari-green-800 text-white font-sans text-sm tracking-widest uppercase transition-colors"
                             >
                                 Start Your Journey

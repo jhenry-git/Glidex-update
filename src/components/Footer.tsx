@@ -101,12 +101,12 @@ export default function Footer() {
                         © {new Date().getFullYear()} GlideX. All rights reserved.
                     </p>
                     <div className="flex items-center gap-6">
-                        <a href="#" className="text-xs text-[rgba(244,246,248,0.4)] hover:text-[rgba(244,246,248,0.7)] transition-colors">
+                        <Link to="/" className="text-xs text-[rgba(244,246,248,0.4)] hover:text-[rgba(244,246,248,0.7)] transition-colors">
                             Privacy Policy
-                        </a>
-                        <a href="#" className="text-xs text-[rgba(244,246,248,0.4)] hover:text-[rgba(244,246,248,0.7)] transition-colors">
+                        </Link>
+                        <Link to="/" className="text-xs text-[rgba(244,246,248,0.4)] hover:text-[rgba(244,246,248,0.7)] transition-colors">
                             Terms of Service
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </div>

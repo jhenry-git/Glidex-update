@@ -1,47 +1,27 @@
-// @ts-nocheck — Root file for Remotion CLI/Lambda only; not part of web app build.
-/**
- * Remotion Root — Entry file for Remotion CLI/Studio and Lambda rendering.
- *
- * Registers ALL compositions for preview and server-side rendering:
- * - HeroVideo (1080×1080) — Featured cars rotation for homepage
- * - CarShowcase (1920×1080) — Per-car cinematic slideshow
- * - SocialReel (1080×1920) — 9:16 vertical for IG/TikTok
- * - AdPipeline (1920×1080) — Multi-car promotional video
- * - HostOnboarding (1920×1080) — Personalized host welcome
- * - OGVideo (1200×630) — Social link preview
- */
-
+// @ts-expect-error TypeScript cannot resolve Remotion CJS types with bundler module resolution
 import { Composition } from 'remotion';
+import { HeroVideoComposition } from '../src/components/remotion/HeroVideo';
+import { CarShowcaseComposition } from '../src/components/remotion/CarShowcase';
+import { SocialReelComposition } from '../src/components/remotion/SocialReel';
+import { AdPipelineComposition } from '../src/components/remotion/AdPipeline';
+import { HostOnboardingComposition } from '../src/components/remotion/HostOnboarding';
 import {
-    HeroVideoComposition,
     getHeroVideoDuration,
-} from '../src/components/remotion/HeroVideo';
-import {
-    CarShowcaseComposition,
     CAR_SHOWCASE_DURATION,
     CAR_SHOWCASE_FPS,
-} from '../src/components/remotion/CarShowcase';
-import {
-    SocialReelComposition,
     SOCIAL_REEL_DURATION,
     SOCIAL_REEL_FPS,
     SOCIAL_REEL_WIDTH,
     SOCIAL_REEL_HEIGHT,
-} from '../src/components/remotion/SocialReel';
-import {
-    AdPipelineComposition,
     getAdPipelineDuration,
     AD_PIPELINE_FPS,
     AD_PIPELINE_WIDTH,
     AD_PIPELINE_HEIGHT,
-} from '../src/components/remotion/AdPipeline';
-import {
-    HostOnboardingComposition,
     HOST_ONBOARDING_DURATION,
     HOST_ONBOARDING_FPS,
     HOST_ONBOARDING_WIDTH,
     HOST_ONBOARDING_HEIGHT,
-} from '../src/components/remotion/HostOnboarding';
+} from '../src/components/remotion/config';
 
 // ─── Sample Data for Preview ───────────────────────────────
 

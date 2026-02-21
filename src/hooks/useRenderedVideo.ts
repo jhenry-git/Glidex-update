@@ -22,7 +22,7 @@ export function useRenderedVideo(carId: string | undefined) {
 
     useEffect(() => {
         if (!carId) {
-            setLoading(false);
+            Promise.resolve().then(() => setLoading(false));
             return;
         }
 

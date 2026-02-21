@@ -4,10 +4,8 @@
  */
 
 import { Player } from '@remotion/player';
-import {
-    HeroVideoComposition,
-    getHeroVideoDuration,
-} from '@/components/remotion/HeroVideo';
+import { HeroVideoComposition } from '@/components/remotion/HeroVideo';
+import { getHeroVideoDuration } from '@/components/remotion/config';
 import type { FormattedCar } from '@/types';
 
 interface HeroVideoPlayerProps {

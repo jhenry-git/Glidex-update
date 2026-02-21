@@ -74,6 +74,7 @@ export const TravelerTales: React.FC = () => {
                                 src={currentTale.image}
                                 alt={currentTale.author}
                                 className="w-full h-full object-cover object-top"
+                                loading="lazy"
                             />
                         </motion.div>
                     </AnimatePresence>
@@ -128,6 +129,7 @@ export const TravelerTales: React.FC = () => {
                                             src={currentTale.host.image}
                                             alt={currentTale.host.name}
                                             className="w-16 h-16 rounded-full object-cover grayscale-[20%]"
+                                            loading="lazy"
                                         />
                                         <div className="absolute -bottom-1 -right-1 bg-emerald-500 rounded-full p-1 border-2 border-brand-black">
                                             <ShieldCheck className="w-3 h-3 text-white" />

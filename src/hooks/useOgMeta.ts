@@ -15,6 +15,7 @@ interface OgMetaOptions {
     video?: string;
     url?: string;
     type?: string;
+    structuredData?: Record<string, unknown>;
 }
 
 /**
@@ -44,10 +45,16 @@ function setMetaName(name: string, content: string) {
 }
 
 export function useOgMeta(options: OgMetaOptions | null) {
-    useEffect(() => {
-        if (!options) return;
+    const title = options?.title;
+    const description = options?.description;
+    const image = options?.image;
+    const video = options?.video;
+    const url = options?.url;
+    const type = options?.type || 'website';
 
-        const { title, description, image, video, url, type = 'website' } = options;
+    useEffect(() => {
+        if (!title || !description) return;
+
         const pageUrl = url ?? window.location.href;
 
         // Update document title
@@ -78,9 +85,33 @@ export function useOgMeta(options: OgMetaOptions | null) {
         setMetaName('twitter:description', description);
         if (image) setMetaName('twitter:image', image);
 
+        // Canonical URL
+        let canonicalEl = document.querySelector('link[rel="canonical"]') as HTMLLinkElement | null;
+        if (!canonicalEl) {
+            canonicalEl = document.createElement('link');
+            canonicalEl.setAttribute('rel', 'canonical');
+            document.head.appendChild(canonicalEl);
+        }
+        canonicalEl.setAttribute('href', pageUrl);
+
+        // Structured Data (JSON-LD)
+        let scriptEl = document.querySelector('script#dynamic-json-ld') as HTMLScriptElement | null;
+        if (options?.structuredData) {
+            if (!scriptEl) {
+                scriptEl = document.createElement('script');
+                scriptEl.id = 'dynamic-json-ld';
+                scriptEl.type = 'application/ld+json';
+                document.head.appendChild(scriptEl);
+            }
+            scriptEl.textContent = JSON.stringify(options.structuredData);
+        } else if (scriptEl) {
+            scriptEl.remove();
+        }
+
         // Cleanup: reset title on unmount
         return () => {
             document.title = 'GlideX — Car Rental in Kenya';
+            if (scriptEl) scriptEl.remove();
         };
-    }, [options?.title, options?.description, options?.image, options?.video, options?.url]);
+    }, [title, description, image, video, url, type, options?.structuredData]);
 }

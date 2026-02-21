@@ -1,4 +1,3 @@
-// @ts-nocheck — Remotion CJS types incompatible with tsc bundler resolution.
 /**
  * AdPipelineComposition — Multi-car promotional video for marketing campaigns.
  *
@@ -11,20 +10,12 @@
  * 1920 × 1080 (landscape), 20 seconds at 30fps
  */
 
-import {
-    AbsoluteFill,
-    Sequence,
-    Img,
-    useCurrentFrame,
-    useVideoConfig,
-    interpolate,
-    spring,
-} from 'remotion';
+// @ts-expect-error TypeScript cannot resolve Remotion CJS types with bundler module resolution
+import { AbsoluteFill, Sequence, Img, useCurrentFrame, useVideoConfig, interpolate, spring } from 'remotion';
 import type { FormattedCar } from '@/types';
 
 // === CONFIG ===
 const FPS = 30;
-const TOTAL_DURATION = 20 * FPS;
 const INTRO_FRAMES = 3 * FPS;
 const FRAMES_PER_CAR = 3 * FPS;
 const OUTRO_FRAMES = 4 * FPS;
@@ -485,14 +476,5 @@ export const AdPipelineComposition: React.FC<AdPipelineProps> = ({
         </AbsoluteFill>
     );
 };
-
-export function getAdPipelineDuration(carCount: number): number {
-    const displayCount = Math.min(Math.max(carCount, 1), 4);
-    return INTRO_FRAMES + displayCount * FRAMES_PER_CAR + OUTRO_FRAMES;
-}
-
-export const AD_PIPELINE_FPS = FPS;
-export const AD_PIPELINE_WIDTH = 1920;
-export const AD_PIPELINE_HEIGHT = 1080;
 
 export default AdPipelineComposition;

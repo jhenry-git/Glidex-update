@@ -1,5 +1,3 @@
-// @ts-nocheck — Remotion's CJS type declarations are incompatible with tsc bundler resolution.
-// Type safety is enforced by Remotion CLI and validated at bundle time by Vite.
 /**
  * HeroVideoComposition — Dynamic hero video showcasing featured cars.
  * 
@@ -13,15 +11,8 @@
  * Can be rendered server-side via Remotion Lambda for static MP4.
  */
 
-import {
-    AbsoluteFill,
-    Sequence,
-    Img,
-    useCurrentFrame,
-    useVideoConfig,
-    interpolate,
-    spring,
-} from 'remotion';
+// @ts-expect-error TypeScript cannot resolve Remotion CJS types with bundler module resolution
+import { AbsoluteFill, Sequence, Img, useCurrentFrame, useVideoConfig, interpolate, spring } from 'remotion';
 import type { FormattedCar } from '@/types';
 
 // === CONFIG ===
@@ -312,13 +303,5 @@ export const HeroVideoComposition: React.FC<HeroVideoProps> = ({
         </AbsoluteFill>
     );
 };
-
-/**
- * Calculate total duration for the hero video based on car count.
- */
-export function getHeroVideoDuration(carCount: number): number {
-    const count = Math.min(Math.max(carCount, 1), 5);
-    return count * (FRAMES_PER_CAR - TRANSITION_FRAMES) + TRANSITION_FRAMES;
-}
 
 export default HeroVideoComposition;

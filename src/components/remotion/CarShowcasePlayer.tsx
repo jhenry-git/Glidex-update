@@ -4,11 +4,11 @@
  */
 
 import { Player } from '@remotion/player';
+import { CarShowcaseComposition } from '@/components/remotion/CarShowcase';
 import {
-    CarShowcaseComposition,
     CAR_SHOWCASE_DURATION,
     CAR_SHOWCASE_FPS,
-} from '@/components/remotion/CarShowcase';
+} from '@/components/remotion/config';
 import type { FormattedCar } from '@/types';
 
 interface CarShowcasePlayerProps {

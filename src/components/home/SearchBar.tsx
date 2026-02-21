@@ -1,7 +1,9 @@
 import React from 'react';
 import { MapPin, Calendar, Car, Search } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
 export const SearchBar: React.FC = () => {
+    const navigate = useNavigate();
     return (
         <div className="w-full bg-white border border-brand-gray-border p-2 md:p-3">
             <div className="flex flex-col md:flex-row gap-2 items-center">
@@ -47,6 +49,7 @@ export const SearchBar: React.FC = () => {
 
                 {/* Search Button */}
                 <button
+                    onClick={() => navigate('/listings')}
                     className="w-full md:w-auto h-full min-h-[56px] px-8 bg-brand-blue hover:bg-brand-blue-hover text-white font-sans text-xs tracking-widest uppercase flex items-center justify-center gap-2 transition-all duration-300"
                 >
                     <Search className="w-4 h-4" />

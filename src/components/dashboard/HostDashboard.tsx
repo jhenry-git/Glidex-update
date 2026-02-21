@@ -80,7 +80,7 @@ export default function HostDashboard() {
     }, [filter]);
 
     useEffect(() => {
-        fetchJobs();
+        Promise.resolve().then(() => fetchJobs());
 
         // Realtime subscription for job status updates
         const channel = supabase
