@@ -1,0 +1,130 @@
+/* App-specific styles */
+
+/* Radial gradient for hero background */
+.bg-gradient-radial {
+  background: radial-gradient(ellipse at center, rgba(255, 255, 255, 0.5) 0%, transparent 70%);
+}
+
+/* Smooth scroll for anchor links */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Ensure sections stack properly */
+.section-pinned {
+  will-change: transform;
+}
+
+/* Circle image hover effect */
+.circle-image img {
+  transition: transform 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+/* Card hover lift */
+.card-shadow {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Button press effect */
+.btn-primary:active,
+.btn-secondary:active,
+.btn-dark:active {
+  transform: scale(0.98);
+}
+
+/* Navigation background on scroll — now handled inline in Navbar.tsx */
+
+/* ====== Mobile Responsive ====== */
+@media (max-width: 768px) {
+
+  /* Cards: center them and make full-width */
+  .section-pinned .absolute.right-\[6vw\].top-1\/2 {
+    right: 50%;
+    transform: translate(50%, -50%);
+    width: 88vw;
+    height: auto;
+    min-height: auto;
+    min-width: unset;
+    padding: 2rem;
+  }
+
+  .section-pinned .absolute.left-\[6vw\].top-1\/2 {
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 88vw;
+    height: auto;
+    min-height: auto;
+    min-width: unset;
+    padding: 2rem;
+  }
+
+  /* Circles: smaller and tucked behind the card */
+  .section-pinned .absolute.left-\[30\%\].top-1\/2,
+  .section-pinned .absolute.left-\[70\%\].top-1\/2 {
+    left: 50%;
+    top: 14vh;
+    width: 55vmin;
+    height: 55vmin;
+    opacity: 0.35;
+  }
+
+  /* Hero headline: increase safe-zone padding */
+  .section-pinned .absolute.left-\[6vw\].top-\[10vh\] {
+    top: 8vh;
+    width: 88vw;
+    left: 6vw;
+  }
+
+  /* Hero subtext */
+  .section-pinned .absolute.left-\[6vw\].top-\[58vh\] {
+    top: auto;
+    bottom: 28vh;
+    width: 88vw;
+    left: 6vw;
+  }
+
+  /* Hero CTA buttons */
+  .section-pinned .absolute.left-\[6vw\].top-\[72vh\] {
+    top: auto;
+    bottom: 16vh;
+    left: 6vw;
+  }
+
+  /* Hero circle: smaller on mobile */
+  .hero-circle {
+    width: 60vmin !important;
+    height: 60vmin !important;
+    top: 46% !important;
+  }
+
+  /* Micro labels at the bottom of sections */
+  .section-pinned .absolute.right-\[6vw\].bottom-\[6vh\],
+  .section-pinned .absolute.left-\[6vw\].bottom-\[6vh\] {
+    bottom: 3vh;
+  }
+
+  /* Card headings: smaller on mobile */
+  .section-pinned h2 {
+    font-size: clamp(28px, 8vw, 48px);
+    margin-bottom: 0.75rem;
+  }
+
+  /* Card body text */
+  .section-pinned .card-shadow p {
+    font-size: 1rem;
+    margin-bottom: 1.25rem;
+  }
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

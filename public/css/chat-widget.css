@@ -1,0 +1,40 @@
+/* --- GLOBALS ADDED TO SUPPORT THE CHAT WIDGET --- */
+html {
+    scroll-behavior: smooth;
+}
+
+/* --- NEW STYLES FOR CHAT WIDGET --- */
+#chat-widget {
+    transition: all 0.3s ease-in-out;
+}
+
+#chat-messages::-webkit-scrollbar {
+    width: 5px;
+}
+
+#chat-messages::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+#chat-messages::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 5px;
+}
+
+#chat-messages::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* New Style for Handoff Button */
+#handoff-button {
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    opacity: 0;
+    transform: scale(0.9);
+    pointer-events: none;
+}
+
+#handoff-button.visible {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
+}

@@ -1,0 +1,6 @@
+{
+    "imports": {
+        "remotion": "npm:remotion@4",
+        "@remotion/lambda": "npm:@remotion/lambda@4"
+    }
+}
