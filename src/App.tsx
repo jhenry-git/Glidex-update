@@ -12,6 +12,8 @@ import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { lazy, Suspense } from 'react';
 import { Loader2 } from 'lucide-react';
 
+import { SmartAppBanner } from '@/components/SmartAppBanner';
+
 // Eager load HomePage (initial route)
 import HomePage from '@/pages/HomePage';
 
@@ -34,6 +36,7 @@ function PageLoader() {
 function App() {
   return (
     <BrowserRouter>
+      <SmartAppBanner />
       <Suspense fallback={<PageLoader />}>
         <Routes>
           <Route path="/" element={<HomePage />} />

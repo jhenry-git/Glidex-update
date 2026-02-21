@@ -4,6 +4,15 @@
 @tailwind components;
 @tailwind utilities;
 
+/* --- App Banner Pushdown --- */
+body.has-app-banner {
+  padding-top: 64px;
+}
+
+body.has-app-banner nav.fixed.top-0 {
+  top: 64px !important;
+}
+
 @layer base {
   :root {
     --background: 216 20% 96%;
@@ -55,11 +64,11 @@
   * {
     @apply border-border;
   }
-  
+
   html {
     scroll-behavior: auto;
   }
-  
+
   body {
     @apply bg-background text-foreground antialiased;
     font-family: 'Inter', sans-serif;
@@ -75,11 +84,11 @@
   .font-display {
     font-family: 'Montserrat', sans-serif;
   }
-  
+
   .font-mono-label {
     font-family: 'IBM Plex Mono', monospace;
   }
-  
+
   .text-headline {
     font-family: 'Montserrat', sans-serif;
     font-weight: 800;
@@ -87,7 +96,7 @@
     line-height: 0.95;
     letter-spacing: -0.02em;
   }
-  
+
   .text-micro {
     font-family: 'IBM Plex Mono', monospace;
     font-weight: 500;
@@ -95,24 +104,24 @@
     letter-spacing: 0.18em;
     text-transform: uppercase;
   }
-  
+
   .circle-image {
     border-radius: 9999px;
     overflow: hidden;
   }
-  
+
   .card-shadow {
     box-shadow: 0 18px 50px rgba(11, 15, 23, 0.10);
   }
-  
+
   .hairline {
     border-color: rgba(11, 15, 23, 0.12);
   }
-  
+
   .hairline-light {
     border-color: rgba(244, 246, 248, 0.14);
   }
-  
+
   .grain-overlay {
     position: fixed;
     top: 0;
@@ -125,35 +134,35 @@
     z-index: 9999;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
   }
-  
+
   .section-pinned {
     position: relative;
     width: 100vw;
     height: 100vh;
     overflow: hidden;
   }
-  
+
   .btn-primary {
     @apply inline-flex items-center justify-center px-6 py-3 rounded-full font-medium transition-all duration-200 bg-brand-blue text-white;
   }
-  
+
   .btn-primary:hover {
     @apply bg-brand-blue-hover;
     box-shadow: 0 8px 24px rgba(37, 99, 235, 0.35);
   }
-  
+
   .btn-secondary {
     @apply inline-flex items-center justify-center px-6 py-3 rounded-full font-medium transition-all duration-200 border border-brand-gray-border text-brand-black bg-transparent;
   }
-  
+
   .btn-secondary:hover {
     @apply bg-brand-gray-soft;
   }
-  
+
   .btn-dark {
     @apply inline-flex items-center justify-center px-6 py-3 rounded-full font-medium transition-all duration-200 bg-brand-black text-white;
   }
-  
+
   .btn-dark:hover {
     @apply bg-brand-charcoal;
     transform: translateY(-2px);
