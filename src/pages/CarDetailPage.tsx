@@ -50,21 +50,53 @@ export default function CarDetailPage() {
                 type: 'product',
                 structuredData: {
                     "@context": "https://schema.org",
-                    "@type": "Car",
-                    "name": `${car.brand} ${car.model}`,
-                    "description": car.description,
-                    "image": car.image_urls?.[0],
-                    "brand": {
-                        "@type": "Brand",
-                        "name": car.brand
-                    },
-                    "offers": {
-                        "@type": "Offer",
-                        "priceCurrency": "KES",
-                        "price": car.price,
-                        "availability": "https://schema.org/InStock",
-                        "url": window.location.href
-                    }
+                    "@graph": [
+                        {
+                            "@type": "Car",
+                            "name": `${car.brand} ${car.model}`,
+                            "description": car.description,
+                            "image": car.image_urls?.[0],
+                            "brand": {
+                                "@type": "Brand",
+                                "name": car.brand
+                            },
+                            "offers": {
+                                "@type": "Offer",
+                                "priceCurrency": "KES",
+                                "price": car.price,
+                                "availability": "https://schema.org/InStock",
+                                "url": window.location.href
+                            }
+                        },
+                        {
+                            "@type": "BreadcrumbList",
+                            "itemListElement": [
+                                {
+                                    "@type": "ListItem",
+                                    "position": 1,
+                                    "name": "Home",
+                                    "item": "https://glidex.co.ke/"
+                                },
+                                {
+                                    "@type": "ListItem",
+                                    "position": 2,
+                                    "name": "Listings",
+                                    "item": "https://glidex.co.ke/listings"
+                                },
+                                {
+                                    "@type": "ListItem",
+                                    "position": 3,
+                                    "name": car.location,
+                                    "item": `https://glidex.co.ke/listings?location=${encodeURIComponent(car.location)}`
+                                },
+                                {
+                                    "@type": "ListItem",
+                                    "position": 4,
+                                    "name": `${car.brand} ${car.model}`
+                                }
+                            ]
+                        }
+                    ]
                 }
             }
             : null

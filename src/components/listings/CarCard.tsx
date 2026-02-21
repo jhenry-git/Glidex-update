@@ -27,7 +27,7 @@ export default function CarCard({ car, onClick }: CarCardProps) {
             <div className="relative aspect-[16/10] overflow-hidden bg-gray-100">
                 <img
                     src={imageUrl}
-                    alt={`${car.brand} ${car.model}`}
+                    alt={`Rent ${car.brand} ${car.model} in ${car.location}`}
                     className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                     loading="lazy"
                 />

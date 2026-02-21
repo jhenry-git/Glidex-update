@@ -13,11 +13,29 @@ import { useCars } from '@/hooks/useCars';
 import type { FormattedCar } from '@/types';
 import { GeneralFAQSchema } from '@/components/seo/GeneralFAQSchema';
 import { PricingFAQSchema } from '@/components/seo/PricingFAQSchema';
+import { useOgMeta } from '@/hooks/useOgMeta';
+import { useMemo } from 'react';
 
 export default function ListingsPage() {
     const navigate = useNavigate();
     const { cars, loading, filters, setFilters, totalCount, filteredCount } =
         useCars();
+
+    const structuredData = useMemo(() => ({
+        "@context": "https://schema.org",
+        "@type": "ItemList",
+        "itemListElement": cars.map((car, index) => ({
+            "@type": "ListItem",
+            "position": index + 1,
+            "url": `https://glidex.co.ke/car/${car.id}`
+        }))
+    }), [cars]);
+
+    useOgMeta({
+        title: "Browse Luxury Car Rentals in Kenya | GlideX",
+        description: "Browse real luxury cars, SUVs, and vans uploaded by verified hosts across Kenya. Book instantly on GlideX.",
+        structuredData
+    });
 
     const handleCarClick = (car: FormattedCar) => {
         navigate(`/car/${car.id}`);

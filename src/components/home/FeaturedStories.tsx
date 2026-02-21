@@ -65,7 +65,7 @@ export const FeaturedStories: React.FC<FeaturedStoriesProps> = ({ cars }) => {
                     onClick={() => navigate('/listings')}
                     className="hidden md:flex items-center gap-3 text-brand-black font-medium hover:text-brand-blue transition-colors group pb-2"
                 >
-                    <span className="text-micro font-bold">View all vehicles</span>
+                    <span className="text-micro font-bold">Browse Kenya Car Inventory</span>
                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </motion.button>
             </div>
@@ -122,7 +122,7 @@ export const FeaturedStories: React.FC<FeaturedStoriesProps> = ({ cars }) => {
                                         </div>
                                         <div className="flex flex-col sm:flex-row gap-3 mt-2">
                                             <button onClick={() => navigate('/listings')} className="btn-primary flex-1 text-sm py-3.5 px-0 w-full sm:w-auto shadow-sm">
-                                                Book Instantly
+                                                Book Rental Instantly
                                             </button>
                                             <button onClick={() => navigate('/stories')} className="btn-secondary flex-1 text-sm py-3.5 px-0 w-full sm:w-auto">
                                                 Read Chapter
@@ -141,7 +141,7 @@ export const FeaturedStories: React.FC<FeaturedStoriesProps> = ({ cars }) => {
                     onClick={() => navigate('/listings')}
                     className="flex items-center gap-3 text-brand-black font-medium transition-colors group"
                 >
-                    <span className="text-micro font-bold">View all vehicles</span>
+                    <span className="text-micro font-bold">Browse Kenya Car Inventory</span>
                     <ArrowRight className="w-4 h-4" />
                 </button>
             </div>

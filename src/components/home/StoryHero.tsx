@@ -43,9 +43,10 @@ export const StoryHero: React.FC = () => {
                     className="mt-[5vh] md:mt-[10vh] max-w-3xl pointer-events-auto"
                 >
                     <h1 className="text-headline text-[clamp(44px,6vw,96px)] text-brand-black">
-                        <span className="block">Drive Your</span>
-                        <span className="block text-brand-blue font-display">Story</span>
-                        <span className="block text-brand-gray-text">With GlideX</span>
+                        <span className="sr-only">Premium Car Rentals & Chauffeurs in Kenya</span>
+                        <span className="block" aria-hidden="true">Drive Your</span>
+                        <span className="block text-brand-blue font-display" aria-hidden="true">Story</span>
+                        <span className="block text-brand-gray-text" aria-hidden="true">With GlideX</span>
                     </h1>
                 </motion.div>
 
