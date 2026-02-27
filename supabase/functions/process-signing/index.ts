@@ -3,11 +3,11 @@
  *
  * Handles the server-side portion of document signing:
  *   1. Fetches original PDF from Supabase Storage
- *   2. Embeds signature image, signer name, and timestamp using pdf-lib
+ *   2. Embeds signature on EVERY page + appends a signature summary page
  *   3. Uploads signed PDF to agreements/signed/
  *   4. Updates document_requests status to 'signed'
  *   5. Creates a signed_documents record
- *   6. Sends email via Resend with the signed PDF attached
+ *   6. Sends email to admin AND client with signed PDF attached
  *
  * Environment variables:
  *   - SUPABASE_URL
@@ -99,8 +99,6 @@ Deno.serve(async (req) => {
         const signatureBytes = Uint8Array.from(atob(base64Data), (c) => c.charCodeAt(0));
         const signatureImg = await pdfDoc.embedPng(signatureBytes);
 
-        // Add a new signature page at the end
-        const page = pdfDoc.addPage([612, 792]); // US Letter
         const timestamp = new Date().toISOString();
         const formattedDate = new Date().toLocaleDateString('en-US', {
             year: 'numeric',
@@ -111,8 +109,81 @@ Deno.serve(async (req) => {
             timeZoneName: 'short',
         });
 
+        // ── Embed signature on EVERY existing page ───────────────
+        const pages = pdfDoc.getPages();
+        const sigFooterHeight = 60; // height of the signature footer band
+
+        for (let i = 0; i < pages.length; i++) {
+            const page = pages[i];
+            const { width } = page.getSize();
+
+            // Semi-transparent white background for the signature footer
+            page.drawRectangle({
+                x: 0,
+                y: 0,
+                width: width,
+                height: sigFooterHeight,
+                color: rgb(1, 1, 1),
+                opacity: 0.92,
+            });
+
+            // Thin separator line at the top of the footer
+            page.drawLine({
+                start: { x: 20, y: sigFooterHeight },
+                end: { x: width - 20, y: sigFooterHeight },
+                thickness: 0.5,
+                color: rgb(0.8, 0.8, 0.8),
+            });
+
+            // Signature image (scaled to fit in footer)
+            const sigDisplayHeight = 30;
+            const sigDisplayWidth = sigDisplayHeight * (signatureImg.width / signatureImg.height);
+            page.drawImage(signatureImg, {
+                x: 20,
+                y: 8,
+                width: Math.min(sigDisplayWidth, 100),
+                height: sigDisplayHeight,
+            });
+
+            // Signer name + date text
+            const textX = Math.min(sigDisplayWidth, 100) + 30;
+            page.drawText(`Signed by: ${signerName}`, {
+                x: textX,
+                y: 36,
+                size: 7.5,
+                font: fontBold,
+                color: rgb(0.15, 0.15, 0.15),
+            });
+            page.drawText(formattedDate, {
+                x: textX,
+                y: 24,
+                size: 6.5,
+                font,
+                color: rgb(0.4, 0.4, 0.4),
+            });
+
+            // Page number + document ID on the right
+            page.drawText(`Page ${i + 1} of ${pages.length}`, {
+                x: width - 120,
+                y: 36,
+                size: 6.5,
+                font,
+                color: rgb(0.5, 0.5, 0.5),
+            });
+            page.drawText(`ID: ${documentId.substring(0, 8)}...`, {
+                x: width - 120,
+                y: 24,
+                size: 6,
+                font,
+                color: rgb(0.6, 0.6, 0.6),
+            });
+        }
+
+        // ── Append full Signature Summary Page ────────────────────
+        const sigPage = pdfDoc.addPage([612, 792]); // US Letter
+
         // Title
-        page.drawText('SIGNATURE PAGE', {
+        sigPage.drawText('SIGNATURE PAGE', {
             x: 50,
             y: 720,
             size: 18,
@@ -121,7 +192,7 @@ Deno.serve(async (req) => {
         });
 
         // Divider
-        page.drawLine({
+        sigPage.drawLine({
             start: { x: 50, y: 710 },
             end: { x: 562, y: 710 },
             thickness: 1,
@@ -129,14 +200,14 @@ Deno.serve(async (req) => {
         });
 
         // Signer info
-        page.drawText('Signed by:', {
+        sigPage.drawText('Signed by:', {
             x: 50,
             y: 680,
             size: 11,
             font,
             color: rgb(0.4, 0.4, 0.4),
         });
-        page.drawText(signerName, {
+        sigPage.drawText(signerName, {
             x: 50,
             y: 660,
             size: 14,
@@ -144,14 +215,14 @@ Deno.serve(async (req) => {
             color: rgb(0.067, 0.067, 0.067),
         });
 
-        page.drawText('Date:', {
+        sigPage.drawText('Date:', {
             x: 50,
             y: 630,
             size: 11,
             font,
             color: rgb(0.4, 0.4, 0.4),
         });
-        page.drawText(formattedDate, {
+        sigPage.drawText(formattedDate, {
             x: 50,
             y: 610,
             size: 12,
@@ -159,8 +230,8 @@ Deno.serve(async (req) => {
             color: rgb(0.067, 0.067, 0.067),
         });
 
-        // Signature image
-        page.drawText('Signature:', {
+        // Large signature image on summary page
+        sigPage.drawText('Signature:', {
             x: 50,
             y: 570,
             size: 11,
@@ -168,26 +239,33 @@ Deno.serve(async (req) => {
             color: rgb(0.4, 0.4, 0.4),
         });
 
-        const sigWidth = 250;
-        const sigHeight = sigWidth * (signatureImg.height / signatureImg.width);
-        page.drawImage(signatureImg, {
+        const fullSigWidth = 250;
+        const fullSigHeight = fullSigWidth * (signatureImg.height / signatureImg.width);
+        sigPage.drawImage(signatureImg, {
             x: 50,
-            y: 560 - sigHeight,
-            width: sigWidth,
-            height: sigHeight,
+            y: 560 - fullSigHeight,
+            width: fullSigWidth,
+            height: fullSigHeight,
         });
 
-        // Footer
-        page.drawText(`Document ID: ${documentId}`, {
+        // Footer on summary page
+        sigPage.drawText(`Document ID: ${documentId}`, {
             x: 50,
             y: 60,
             size: 8,
             font,
             color: rgb(0.6, 0.6, 0.6),
         });
-        page.drawText(`Timestamp: ${timestamp}`, {
+        sigPage.drawText(`Timestamp: ${timestamp}`, {
             x: 50,
             y: 46,
+            size: 8,
+            font,
+            color: rgb(0.6, 0.6, 0.6),
+        });
+        sigPage.drawText(`Total pages signed: ${pages.length}`, {
+            x: 50,
+            y: 32,
             size: 8,
             font,
             color: rgb(0.6, 0.6, 0.6),
@@ -232,9 +310,9 @@ Deno.serve(async (req) => {
             signed_at: signedAt,
         });
 
-        // ── Send email via Resend ────────────────────────────────
+        // ── Send emails via Resend ───────────────────────────────
         const resendApiKey = Deno.env.get('RESEND_API_KEY');
-        const adminEmail = Deno.env.get('ADMIN_EMAIL') || 'support@glidexp.com';
+        const adminEmail = Deno.env.get('ADMIN_EMAIL') || docRequest.admin_email || 'support@glidexp.com';
 
         if (resendApiKey) {
             // Convert signed PDF to base64 for email attachment
@@ -242,42 +320,39 @@ Deno.serve(async (req) => {
                 String.fromCharCode(...new Uint8Array(signedPdfBytes))
             );
 
-            const emailRecipients = [adminEmail];
-            if (docRequest.client_email) {
-                emailRecipients.push(docRequest.client_email);
-            }
+            const attachment = {
+                filename: `signed-agreement-${documentId}.pdf`,
+                content: pdfBase64,
+            };
 
-            const emailPayload = {
+            // ── Email to Admin ──────────────────────────────────────
+            const adminEmailPayload = {
                 from: 'GlideX Signing <noreply@glidexp.com>',
-                to: emailRecipients,
-                subject: `Document Signed by ${signerName}`,
+                to: [adminEmail],
+                subject: `✅ Document Signed by ${signerName}`,
                 html: `
-          <div style="font-family: 'Inter', sans-serif; max-width: 580px; margin: 0 auto; padding: 32px 24px;">
+          <div style="font-family: 'Inter', Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 32px 24px;">
             <div style="text-align: center; margin-bottom: 32px;">
               <div style="display: inline-block; width: 40px; height: 40px; background: #111; border-radius: 10px; line-height: 40px; color: #fff; font-weight: bold; font-size: 14px;">GX</div>
-              <h2 style="margin: 12px 0 4px; color: #111; font-size: 20px;">Document Signed</h2>
+              <h2 style="margin: 12px 0 4px; color: #111; font-size: 20px;">Document Signed Successfully</h2>
             </div>
             <p style="color: #555; font-size: 14px; line-height: 1.6;">
-              <strong>${signerName}</strong> has signed the document.<br/>
-              Signed on: ${formattedDate}
+              <strong>${signerName}</strong> has signed the agreement document.<br/>
+              Signed on: <strong>${formattedDate}</strong>
             </p>
             <p style="color: #555; font-size: 14px; line-height: 1.6;">
-              The signed document is attached to this email and also available at:<br/>
-              <a href="${signedFileUrl}" style="color: #D7A04D;">${signedFileUrl}</a>
+              The signed document (with signatures on every page) is attached to this email and also available at:<br/>
+              <a href="${signedFileUrl}" style="color: #D7A04D; text-decoration: underline;">Download Signed Document</a>
             </p>
             <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
             <p style="color: #999; font-size: 11px;">
               Document ID: ${documentId}<br/>
+              Client email: ${docRequest.client_email || 'N/A'}<br/>
               This is an automated message from GlideX Signing.
             </p>
           </div>
         `,
-                attachments: [
-                    {
-                        filename: `signed-agreement-${documentId}.pdf`,
-                        content: pdfBase64,
-                    },
-                ],
+                attachments: [attachment],
             };
 
             await fetch('https://api.resend.com/emails', {
@@ -286,10 +361,53 @@ Deno.serve(async (req) => {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${resendApiKey}`,
                 },
-                body: JSON.stringify(emailPayload),
+                body: JSON.stringify(adminEmailPayload),
             });
+
+            // ── Email to Client (copy) ──────────────────────────────
+            if (docRequest.client_email) {
+                const clientEmailPayload = {
+                    from: 'GlideX Signing <noreply@glidexp.com>',
+                    to: [docRequest.client_email],
+                    subject: `Your Signed Document — ${signerName}`,
+                    html: `
+            <div style="font-family: 'Inter', Arial, sans-serif; max-width: 580px; margin: 0 auto; padding: 32px 24px;">
+              <div style="text-align: center; margin-bottom: 32px;">
+                <div style="display: inline-block; width: 40px; height: 40px; background: #111; border-radius: 10px; line-height: 40px; color: #fff; font-weight: bold; font-size: 14px;">GX</div>
+                <h2 style="margin: 12px 0 4px; color: #111; font-size: 20px;">Your Document Has Been Signed</h2>
+              </div>
+              <p style="color: #555; font-size: 14px; line-height: 1.6;">
+                Hi ${signerName},<br/><br/>
+                Thank you for signing the agreement. A copy of your signed document is attached to this email for your records.
+              </p>
+              <p style="color: #555; font-size: 14px; line-height: 1.6;">
+                You can also download it here:<br/>
+                <a href="${signedFileUrl}" style="color: #D7A04D; text-decoration: underline;">Download Signed Document</a>
+              </p>
+              <hr style="border: none; border-top: 1px solid #eee; margin: 24px 0;" />
+              <p style="color: #999; font-size: 11px;">
+                Signed on: ${formattedDate}<br/>
+                Document ID: ${documentId}<br/>
+                This is an automated message from GlideX.
+              </p>
+            </div>
+          `,
+                    attachments: [attachment],
+                };
+
+                await fetch('https://api.resend.com/emails', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${resendApiKey}`,
+                    },
+                    body: JSON.stringify(clientEmailPayload),
+                });
+            }
+
+            console.log(`[process-signing] Emails sent — admin: ${adminEmail}, client: ${docRequest.client_email || 'none'}`);
         } else {
-            console.warn('[process-signing] RESEND_API_KEY not set — skipping email.');
+            console.warn('[process-signing] RESEND_API_KEY not set — skipping emails.');
         }
 
         // ── Response ─────────────────────────────────────────────
@@ -310,3 +428,4 @@ Deno.serve(async (req) => {
         );
     }
 });
+
