@@ -315,10 +315,15 @@ Deno.serve(async (req) => {
         const adminEmail = Deno.env.get('ADMIN_EMAIL') || docRequest.admin_email || 'support@glidexp.com';
 
         if (resendApiKey) {
-            // Convert signed PDF to base64 for email attachment
-            const pdfBase64 = btoa(
-                String.fromCharCode(...new Uint8Array(signedPdfBytes))
-            );
+            // Convert signed PDF to base64 for email attachment (chunked to avoid stack overflow)
+            const bytes = new Uint8Array(signedPdfBytes);
+            let binary = '';
+            const chunkSize = 8192;
+            for (let i = 0; i < bytes.length; i += chunkSize) {
+                const chunk = bytes.subarray(i, Math.min(i + chunkSize, bytes.length));
+                binary += String.fromCharCode(...chunk);
+            }
+            const pdfBase64 = btoa(binary);
 
             const attachment = {
                 filename: `signed-agreement-${documentId}.pdf`,
