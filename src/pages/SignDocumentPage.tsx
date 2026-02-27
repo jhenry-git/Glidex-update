@@ -59,12 +59,13 @@ export default function SignDocumentPage() {
 
     // Submit handler
     const handleSubmit = async () => {
-        if (!id || !signerName.trim() || !consentChecked || !signatureImage) return;
+        if (!document || !signerName.trim() || !consentChecked || !signatureImage) return;
 
         setPageState('submitting');
 
+        // Use the record's actual `id` (not the URL token) for submission
         const { success, error } = await submitSignature({
-            documentId: id,
+            documentId: document.id,
             signerName: signerName.trim(),
             signatureImage,
         });
