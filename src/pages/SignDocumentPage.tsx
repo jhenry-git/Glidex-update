@@ -169,16 +169,25 @@ export default function SignDocumentPage() {
                 {/* PDF Preview */}
                 {document?.document_url && (
                     <div className="rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm">
-                        <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
-                            <FileText className="w-4 h-4 text-gray-400" />
-                            <span className="text-sm font-medium text-gray-600">Agreement Document</span>
+                        <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                                <FileText className="w-4 h-4 text-gray-400" />
+                                <span className="text-sm font-medium text-gray-600">Agreement Document</span>
+                            </div>
+                            <a
+                                href={document.document_url}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-xs font-medium text-[#D7A04D] hover:underline"
+                            >
+                                Open in new tab ↗
+                            </a>
                         </div>
-                        <div className="aspect-[8.5/11] w-full">
+                        <div className="aspect-[8.5/11] w-full bg-gray-100">
                             <iframe
-                                src={document.document_url}
+                                src={`https://docs.google.com/gview?url=${encodeURIComponent(document.document_url)}&embedded=true`}
                                 title="Document Preview"
                                 className="w-full h-full border-0"
-                                sandbox="allow-same-origin"
                             />
                         </div>
                     </div>
