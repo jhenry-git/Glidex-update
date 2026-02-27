@@ -110,6 +110,79 @@ Deno.serve(async (req) => {
             timeZoneName: 'short',
         });
 
+        // ── Flatten formData onto the original PDF ────────────────
+        // Server-side coordinate map: { fieldId → { page, topPct, leftPct, widthPct } }
+        // These match the frontend contractFieldMap percentages.
+        // PDF coordinate system: origin is bottom-left, y increases upward.
+        // topPct from the frontend is distance from TOP, so we convert: y = height * (1 - topPct/100)
+        interface FieldCoord {
+            page: number;    // 1-indexed
+            topPct: number;  // % from top
+            leftPct: number; // % from left
+            fontSize?: number;
+        }
+
+        const FIELD_COORDS: Record<string, FieldCoord> = {
+            agreement_day: { page: 1, topPct: 22.5, leftPct: 47, fontSize: 9 },
+            agreement_month: { page: 1, topPct: 22.5, leftPct: 60, fontSize: 9 },
+            agreement_year: { page: 1, topPct: 22.5, leftPct: 80, fontSize: 9 },
+            host_name: { page: 1, topPct: 33, leftPct: 12, fontSize: 9 },
+            host_id_number: { page: 1, topPct: 35, leftPct: 24, fontSize: 9 },
+            host_kra_pin: { page: 1, topPct: 37, leftPct: 42, fontSize: 9 },
+            host_po_box: { page: 1, topPct: 39, leftPct: 24, fontSize: 9 },
+            vehicle_make_model: { page: 1, topPct: 45, leftPct: 28, fontSize: 9 },
+            vehicle_reg_number: { page: 1, topPct: 47, leftPct: 32, fontSize: 9 },
+            vehicle_chassis_no: { page: 1, topPct: 49, leftPct: 22, fontSize: 9 },
+            vehicle_engine_no: { page: 1, topPct: 51, leftPct: 22, fontSize: 9 },
+            vehicle_year: { page: 1, topPct: 53, leftPct: 34, fontSize: 9 },
+            gps_company: { page: 1, topPct: 60, leftPct: 22, fontSize: 9 },
+            gps_app_name: { page: 1, topPct: 62, leftPct: 38, fontSize: 9 },
+            gps_login: { page: 1, topPct: 64, leftPct: 16, fontSize: 9 },
+            gps_password: { page: 1, topPct: 66, leftPct: 20, fontSize: 9 },
+            commencement_date: { page: 2, topPct: 10, leftPct: 62, fontSize: 9 },
+            commencement_year: { page: 2, topPct: 10, leftPct: 78, fontSize: 9 },
+            lease_period_months: { page: 2, topPct: 14, leftPct: 52, fontSize: 9 },
+            compensation_model: { page: 4, topPct: 15, leftPct: 12, fontSize: 9 },
+            fixed_monthly_sum_words: { page: 4, topPct: 72, leftPct: 32, fontSize: 9 },
+            fixed_monthly_sum_figures: { page: 4, topPct: 75, leftPct: 16, fontSize: 9 },
+        };
+
+        if (formData && Object.keys(formData).length > 0) {
+            const allPages = pdfDoc.getPages();
+
+            for (const [fieldId, value] of Object.entries(formData)) {
+                if (!value || !value.trim()) continue;
+
+                const coord = FIELD_COORDS[fieldId];
+                if (!coord) continue; // unknown field, skip
+
+                const pageIndex = coord.page - 1; // 0-indexed
+                if (pageIndex < 0 || pageIndex >= allPages.length) continue;
+
+                const page = allPages[pageIndex];
+                const { width, height } = page.getSize();
+
+                const x = (coord.leftPct / 100) * width;
+                const y = height * (1 - coord.topPct / 100); // flip from top to bottom-origin
+
+                // Format display value for compensation model
+                let displayValue = value;
+                if (fieldId === 'compensation_model') {
+                    displayValue = value === 'option_a'
+                        ? '✓ Option A — Revenue Share'
+                        : '✓ Option B — Fixed Lease';
+                }
+
+                page.drawText(displayValue, {
+                    x,
+                    y,
+                    size: coord.fontSize || 9,
+                    font: fontBold,
+                    color: rgb(0.05, 0.05, 0.4), // dark blue for visibility
+                });
+            }
+        }
+
         // ── Embed signature on EVERY existing page ───────────────
         const pages = pdfDoc.getPages();
         const sigFooterHeight = 60; // height of the signature footer band

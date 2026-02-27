@@ -8,13 +8,14 @@
 
 import { useParams } from 'react-router-dom';
 import { useState, useEffect, useCallback } from 'react';
-import { Loader2, CheckCircle2, AlertTriangle, FileText, Send, ClipboardList } from 'lucide-react';
+import { Loader2, CheckCircle2, AlertTriangle, FileText, Send } from 'lucide-react';
 import SignaturePad from '@/components/signing/SignaturePad';
+import DocumentOverlayViewer from '@/components/signing/DocumentOverlayViewer';
+import { GLIDEX_HOST_CONTRACT_FIELDS } from '@/lib/signing/contractFieldMap';
 import {
     fetchDocumentRequest,
     submitSignature,
     type DocumentRequest,
-    type FormField,
 } from '@/lib/signing/signingService';
 
 type PageState = 'loading' | 'ready' | 'signed' | 'submitting' | 'success' | 'error';
@@ -64,16 +65,24 @@ export default function SignDocumentPage() {
         })();
     }, [id]);
 
-    // Check if all required form fields are filled
-    const formFields: FormField[] = document?.form_fields ?? [];
-    const areFormFieldsValid = formFields
-        .filter((f) => f.required)
+    // Check if all required overlay fields are filled
+    // For overlay fields, check required fields from the contract map
+    const overlayFields = GLIDEX_HOST_CONTRACT_FIELDS;
+    const areOverlayFieldsValid = overlayFields
+        .filter((f) => {
+            if (!f.required) return false;
+            // Fixed lease fields only required when Option B selected
+            if (f.id === 'fixed_monthly_sum_words' || f.id === 'fixed_monthly_sum_figures') {
+                return formData['compensation_model'] === 'option_b';
+            }
+            return true;
+        })
         .every((f) => formData[f.id]?.trim());
 
     // Submit handler
     const handleSubmit = async () => {
         if (!document || !signerName.trim() || !consentChecked || !signatureImage) return;
-        if (!areFormFieldsValid) return;
+        if (!areOverlayFieldsValid) return;
 
         setPageState('submitting');
 
@@ -93,7 +102,7 @@ export default function SignDocumentPage() {
         }
     };
 
-    const isFormValid = signerName.trim().length > 0 && consentChecked && signatureImage !== null && areFormFieldsValid;
+    const isFormValid = signerName.trim().length > 0 && consentChecked && signatureImage !== null && areOverlayFieldsValid;
 
     // ─── Render States ──────────────────────────────────────────
 
@@ -166,7 +175,7 @@ export default function SignDocumentPage() {
 
     return (
         <PageShell>
-            <div className="max-w-2xl mx-auto space-y-8 py-6 sm:py-10">
+            <div className="max-w-4xl mx-auto space-y-8 py-6 sm:py-10">
                 {/* Header */}
                 <div className="text-center space-y-2">
                     <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#D7A04D]/10 text-[#D7A04D] text-xs font-semibold tracking-wider uppercase">
@@ -177,83 +186,18 @@ export default function SignDocumentPage() {
                         Review &amp; Sign
                     </h1>
                     <p className="text-sm text-gray-500">
-                        Please review the document below and provide your signature.
+                        Review the document below, fill in the highlighted fields, then sign at the bottom.
                     </p>
                 </div>
 
-                {/* PDF Preview */}
+                {/* PDF with Overlay Inputs */}
                 {document?.document_url && (
-                    <div className="rounded-2xl overflow-hidden border border-gray-200 bg-white shadow-sm">
-                        <div className="bg-gray-50 px-4 py-3 border-b border-gray-200 flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                                <FileText className="w-4 h-4 text-gray-400" />
-                                <span className="text-sm font-medium text-gray-600">Agreement Document</span>
-                            </div>
-                            <a
-                                href={document.document_url}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-xs font-medium text-[#D7A04D] hover:underline"
-                            >
-                                Open in new tab ↗
-                            </a>
-                        </div>
-                        <div className="aspect-[8.5/11] w-full bg-gray-100">
-                            <iframe
-                                src={`https://docs.google.com/gview?url=${encodeURIComponent(document.document_url)}&embedded=true`}
-                                title="Document Preview"
-                                className="w-full h-full border-0"
-                            />
-                        </div>
-                    </div>
-                )}
-
-                {/* Dynamic Form Fields */}
-                {formFields.length > 0 && (
-                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8 space-y-6">
-                        <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
-                            <ClipboardList className="w-5 h-5 text-[#D7A04D]" />
-                            <h2 className="text-base font-semibold text-gray-900">Document Details</h2>
-                            <span className="text-xs text-gray-400 ml-auto">Fill in the required fields</span>
-                        </div>
-
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            {formFields.map((field) => (
-                                <div key={field.id} className={field.type === 'select' ? 'sm:col-span-2' : ''}>
-                                    <label
-                                        htmlFor={`field-${field.id}`}
-                                        className="block text-sm font-medium text-gray-700 mb-1.5"
-                                    >
-                                        {field.label}
-                                        {field.required && <span className="text-red-400 ml-0.5">*</span>}
-                                    </label>
-
-                                    {field.type === 'select' && field.options ? (
-                                        <select
-                                            id={`field-${field.id}`}
-                                            value={formData[field.id] || ''}
-                                            onChange={(e) => updateFormField(field.id, e.target.value)}
-                                            className="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#D7A04D]/40 focus:border-[#D7A04D] transition-all"
-                                        >
-                                            <option value="">Select {field.label.toLowerCase()}…</option>
-                                            {field.options.map((opt) => (
-                                                <option key={opt} value={opt}>{opt}</option>
-                                            ))}
-                                        </select>
-                                    ) : (
-                                        <input
-                                            id={`field-${field.id}`}
-                                            type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'}
-                                            value={formData[field.id] || ''}
-                                            onChange={(e) => updateFormField(field.id, e.target.value)}
-                                            placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}`}
-                                            className="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#D7A04D]/40 focus:border-[#D7A04D] transition-all"
-                                        />
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
+                    <DocumentOverlayViewer
+                        pdfUrl={document.document_url}
+                        fields={overlayFields}
+                        formData={formData}
+                        onFormDataChange={updateFormField}
+                    />
                 )}
 
                 {/* Signing Form */}
