@@ -7,13 +7,14 @@
  */
 
 import { useParams } from 'react-router-dom';
-import { useState, useEffect } from 'react';
-import { Loader2, CheckCircle2, AlertTriangle, FileText, Send } from 'lucide-react';
+import { useState, useEffect, useCallback } from 'react';
+import { Loader2, CheckCircle2, AlertTriangle, FileText, Send, ClipboardList } from 'lucide-react';
 import SignaturePad from '@/components/signing/SignaturePad';
 import {
     fetchDocumentRequest,
     submitSignature,
     type DocumentRequest,
+    type FormField,
 } from '@/lib/signing/signingService';
 
 type PageState = 'loading' | 'ready' | 'signed' | 'submitting' | 'success' | 'error';
@@ -28,6 +29,12 @@ export default function SignDocumentPage() {
     const [signerName, setSignerName] = useState('');
     const [consentChecked, setConsentChecked] = useState(false);
     const [signatureImage, setSignatureImage] = useState<string | null>(null);
+    const [formData, setFormData] = useState<Record<string, string>>({});
+
+    // Update a form field value
+    const updateFormField = useCallback((fieldId: string, value: string) => {
+        setFormData((prev) => ({ ...prev, [fieldId]: value }));
+    }, []);
 
     // Load document on mount
     useEffect(() => {
@@ -57,9 +64,16 @@ export default function SignDocumentPage() {
         })();
     }, [id]);
 
+    // Check if all required form fields are filled
+    const formFields: FormField[] = document?.form_fields ?? [];
+    const areFormFieldsValid = formFields
+        .filter((f) => f.required)
+        .every((f) => formData[f.id]?.trim());
+
     // Submit handler
     const handleSubmit = async () => {
         if (!document || !signerName.trim() || !consentChecked || !signatureImage) return;
+        if (!areFormFieldsValid) return;
 
         setPageState('submitting');
 
@@ -68,6 +82,7 @@ export default function SignDocumentPage() {
             documentId: document.id,
             signerName: signerName.trim(),
             signatureImage,
+            formData: Object.keys(formData).length > 0 ? formData : undefined,
         });
 
         if (success) {
@@ -78,7 +93,7 @@ export default function SignDocumentPage() {
         }
     };
 
-    const isFormValid = signerName.trim().length > 0 && consentChecked && signatureImage !== null;
+    const isFormValid = signerName.trim().length > 0 && consentChecked && signatureImage !== null && areFormFieldsValid;
 
     // ─── Render States ──────────────────────────────────────────
 
@@ -189,6 +204,54 @@ export default function SignDocumentPage() {
                                 title="Document Preview"
                                 className="w-full h-full border-0"
                             />
+                        </div>
+                    </div>
+                )}
+
+                {/* Dynamic Form Fields */}
+                {formFields.length > 0 && (
+                    <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 sm:p-8 space-y-6">
+                        <div className="flex items-center gap-2 pb-2 border-b border-gray-100">
+                            <ClipboardList className="w-5 h-5 text-[#D7A04D]" />
+                            <h2 className="text-base font-semibold text-gray-900">Document Details</h2>
+                            <span className="text-xs text-gray-400 ml-auto">Fill in the required fields</span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {formFields.map((field) => (
+                                <div key={field.id} className={field.type === 'select' ? 'sm:col-span-2' : ''}>
+                                    <label
+                                        htmlFor={`field-${field.id}`}
+                                        className="block text-sm font-medium text-gray-700 mb-1.5"
+                                    >
+                                        {field.label}
+                                        {field.required && <span className="text-red-400 ml-0.5">*</span>}
+                                    </label>
+
+                                    {field.type === 'select' && field.options ? (
+                                        <select
+                                            id={`field-${field.id}`}
+                                            value={formData[field.id] || ''}
+                                            onChange={(e) => updateFormField(field.id, e.target.value)}
+                                            className="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm text-gray-900 bg-white focus:outline-none focus:ring-2 focus:ring-[#D7A04D]/40 focus:border-[#D7A04D] transition-all"
+                                        >
+                                            <option value="">Select {field.label.toLowerCase()}…</option>
+                                            {field.options.map((opt) => (
+                                                <option key={opt} value={opt}>{opt}</option>
+                                            ))}
+                                        </select>
+                                    ) : (
+                                        <input
+                                            id={`field-${field.id}`}
+                                            type={field.type === 'number' ? 'number' : field.type === 'date' ? 'date' : 'text'}
+                                            value={formData[field.id] || ''}
+                                            onChange={(e) => updateFormField(field.id, e.target.value)}
+                                            placeholder={field.placeholder || `Enter ${field.label.toLowerCase()}`}
+                                            className="w-full px-4 py-3 rounded-xl border border-gray-300 text-sm text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-[#D7A04D]/40 focus:border-[#D7A04D] transition-all"
+                                        />
+                                    )}
+                                </div>
+                            ))}
                         </div>
                     </div>
                 )}

@@ -12,6 +12,15 @@
 
 import { supabaseSigning } from './supabaseSigningClient';
 
+export interface FormField {
+    id: string;
+    label: string;
+    type: 'text' | 'date' | 'number' | 'select';
+    required: boolean;
+    options?: string[]; // for select type
+    placeholder?: string;
+}
+
 export interface DocumentRequest {
     id: string;
     admin_email: string;
@@ -22,12 +31,14 @@ export interface DocumentRequest {
     status: 'pending' | 'signed';
     created_at: string;
     signed_at: string | null;
+    form_fields: FormField[] | null;
 }
 
 export interface SignaturePayload {
     documentId: string; // This is the record's `id`, not the signing_token
     signerName: string;
     signatureImage: string; // base64 PNG
+    formData?: Record<string, string>; // filled form field values
 }
 
 /**

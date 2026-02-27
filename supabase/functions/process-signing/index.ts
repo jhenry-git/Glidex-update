@@ -29,6 +29,7 @@ interface SigningPayload {
     documentId: string;
     signerName: string;
     signatureImage: string; // base64 data URL
+    formData?: Record<string, string>; // filled form field values
 }
 
 Deno.serve(async (req) => {
@@ -47,7 +48,7 @@ Deno.serve(async (req) => {
     try {
         // ── Parse payload ────────────────────────────────────────
         const payload: SigningPayload = await req.json();
-        const { documentId, signerName, signatureImage } = payload;
+        const { documentId, signerName, signatureImage, formData } = payload;
 
         if (!documentId || !signerName || !signatureImage) {
             return new Response(
@@ -248,6 +249,56 @@ Deno.serve(async (req) => {
             height: fullSigHeight,
         });
 
+        // ── Render form data on summary page (if present) ────────
+        const formEntries = formData ? Object.entries(formData) : [];
+        if (formEntries.length > 0) {
+            let formY = 560 - fullSigHeight - 40;
+
+            sigPage.drawText('DOCUMENT DETAILS', {
+                x: 50,
+                y: formY,
+                size: 12,
+                font: fontBold,
+                color: rgb(0.067, 0.067, 0.067),
+            });
+            formY -= 6;
+
+            sigPage.drawLine({
+                start: { x: 50, y: formY },
+                end: { x: 562, y: formY },
+                thickness: 0.5,
+                color: rgb(0.85, 0.85, 0.85),
+            });
+            formY -= 18;
+
+            for (const [key, value] of formEntries) {
+                if (formY < 80) break; // don't overflow into footer
+
+                // Format key: replace underscores/camelCase with readable labels
+                const label = key
+                    .replace(/_/g, ' ')
+                    .replace(/([A-Z])/g, ' $1')
+                    .replace(/^./, (s) => s.toUpperCase())
+                    .trim();
+
+                sigPage.drawText(`${label}:`, {
+                    x: 50,
+                    y: formY,
+                    size: 9,
+                    font,
+                    color: rgb(0.4, 0.4, 0.4),
+                });
+                sigPage.drawText(value || '—', {
+                    x: 200,
+                    y: formY,
+                    size: 9,
+                    font: fontBold,
+                    color: rgb(0.1, 0.1, 0.1),
+                });
+                formY -= 18;
+            }
+        }
+
         // Footer on summary page
         sigPage.drawText(`Document ID: ${documentId}`, {
             x: 50,
@@ -345,6 +396,15 @@ Deno.serve(async (req) => {
               <strong>${signerName}</strong> has signed the agreement document.<br/>
               Signed on: <strong>${formattedDate}</strong>
             </p>
+            ${formEntries.length > 0 ? `
+            <div style="background: #f9f9f9; border-radius: 8px; padding: 16px; margin: 16px 0;">
+              <p style="color: #111; font-size: 13px; font-weight: 600; margin: 0 0 8px;">Document Details</p>
+              ${formEntries.map(([k, v]) => {
+                    const label = k.replace(/_/g, ' ').replace(/([A-Z])/g, ' $1').replace(/^./, (s: string) => s.toUpperCase()).trim();
+                    return `<p style="color: #555; font-size: 13px; margin: 4px 0;"><strong>${label}:</strong> ${v || '—'}</p>`;
+                }).join('')}
+            </div>
+            ` : ''}
             <p style="color: #555; font-size: 14px; line-height: 1.6;">
               The signed document (with signatures on every page) is attached to this email and also available at:<br/>
               <a href="${signedFileUrl}" style="color: #D7A04D; text-decoration: underline;">Download Signed Document</a>
