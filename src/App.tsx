@@ -21,6 +21,7 @@ import HomePage from '@/pages/HomePage';
 const ListingsPage = lazy(() => import('@/pages/ListingsPage'));
 const CarDetailPage = lazy(() => import('@/pages/CarDetailPage'));
 const HostDashboard = lazy(() => import('@/components/dashboard/HostDashboard'));
+const SignDocumentPage = lazy(() => import('@/pages/SignDocumentPage'));
 
 function PageLoader() {
   return (
@@ -43,6 +44,7 @@ function App() {
           <Route path="/listings" element={<ListingsPage />} />
           <Route path="/car/:id" element={<CarDetailPage />} />
           <Route path="/dashboard" element={<HostDashboard />} />
+          <Route path="/sign/:id" element={<SignDocumentPage />} />
         </Routes>
       </Suspense>
     </BrowserRouter>
