@@ -189,8 +189,8 @@ Deno.serve(async (req) => {
                 let displayValue = value;
                 if (fieldId === 'compensation_model') {
                     displayValue = value === 'option_a'
-                        ? '✓ Option A — Revenue Share'
-                        : '✓ Option B — Fixed Lease';
+                        ? '[X] Option A - Revenue Share'
+                        : '[X] Option B - Fixed Lease';
                 }
 
                 page.drawText(displayValue, {
