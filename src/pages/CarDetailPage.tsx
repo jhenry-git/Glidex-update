@@ -26,6 +26,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useCarDetail } from '@/hooks/useCarDetail';
 import { useRenderedVideo } from '@/hooks/useRenderedVideo';
+import { useVideoGeneration } from '@/hooks/useVideoGeneration';
 import { useOgMeta } from '@/hooks/useOgMeta';
 import { PricingFAQSchema } from '@/components/seo/PricingFAQSchema';
 
@@ -37,7 +38,19 @@ export default function CarDetailPage() {
     const navigate = useNavigate();
     const { car, reviews, loading, error } = useCarDetail(id);
     const { showcaseUrl, ogVideoUrl } = useRenderedVideo(id);
+    const { generateVideo, status: renderStatus, error: renderError } = useVideoGeneration(id);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
+
+    const handleGenerateVideo = async () => {
+        const newUrl = await generateVideo();
+        if (newUrl) {
+            // We could manually update state, but a small delay and reload is easiest
+            // to ensure useRenderedVideo picks it up from the DB
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
+        }
+    };
 
     // Dynamic OG meta tags for social sharing
     useOgMeta(
@@ -285,13 +298,57 @@ export default function CarDetailPage() {
                                         <Suspense
                                             fallback={
                                                 <div className="aspect-video bg-gray-100 rounded-2xl animate-pulse flex items-center justify-center">
-                                                    <Film className="w-8 h-8 text-gray-300" />
+                                                    <Loader2 className="w-8 h-8 text-gray-300 animate-spin" />
                                                 </div>
                                             }
                                         >
                                             <CarShowcasePlayer car={car} />
                                         </Suspense>
                                     )}
+
+                                    {/* Video Rendering Controls */}
+                                    <div className="mt-4 pt-4 border-t border-gray-100 flex items-center justify-between">
+                                        <div>
+                                            {renderStatus === 'error' ? (
+                                                <p className="text-sm text-red-500">{renderError || 'Generation failed'}</p>
+                                            ) : (
+                                                <p className="text-sm text-gray-500">
+                                                    {showcaseUrl
+                                                        ? 'High-quality pre-rendered MP4 available.'
+                                                        : 'Currently using live rendering player.'}
+                                                </p>
+                                            )}
+                                        </div>
+                                        <div>
+                                            {showcaseUrl ? (
+                                                <a
+                                                    href={`/api/download?url=${encodeURIComponent(showcaseUrl)}`}
+                                                    className="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors"
+                                                >
+                                                    <Film className="w-4 h-4 mr-2" />
+                                                    Download MP4
+                                                </a>
+                                            ) : (
+                                                <button
+                                                    onClick={handleGenerateVideo}
+                                                    disabled={renderStatus === 'rendering'}
+                                                    className="inline-flex items-center px-4 py-2 bg-[#D7A04D] text-white text-sm font-medium rounded-xl hover:bg-[#c29045] transition-colors disabled:opacity-70"
+                                                >
+                                                    {renderStatus === 'rendering' ? (
+                                                        <>
+                                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                            Rendering locally...
+                                                        </>
+                                                    ) : (
+                                                        <>
+                                                            <Film className="w-4 h-4 mr-2" />
+                                                            Generate MP4
+                                                        </>
+                                                    )}
+                                                </button>
+                                            )}
+                                        </div>
+                                    </div>
                                 </div>
                             )}
 
