@@ -40,15 +40,49 @@ export default function CarDetailPage() {
     const { showcaseUrl, ogVideoUrl } = useRenderedVideo(id);
     const { generateVideo, status: renderStatus, error: renderError } = useVideoGeneration(id);
     const [activeImageIndex, setActiveImageIndex] = useState(0);
+    const [isDownloading, setIsDownloading] = useState(false);
 
-    const handleGenerateVideo = async () => {
+    const handleGenerateAndDownload = async () => {
+        setIsDownloading(true);
         const newUrl = await generateVideo();
         if (newUrl) {
-            // We could manually update state, but a small delay and reload is easiest
-            // to ensure useRenderedVideo picks it up from the DB
+            await executeDownload(newUrl);
             setTimeout(() => {
                 window.location.reload();
             }, 1000);
+        }
+        setIsDownloading(false);
+    };
+
+    const handleDownloadExisting = async () => {
+        if (!showcaseUrl) return;
+        setIsDownloading(true);
+        await executeDownload(showcaseUrl);
+        setIsDownloading(false);
+    };
+
+    const executeDownload = async (fileUrl: string) => {
+        if (!car) return;
+        try {
+            const API_URL = import.meta.env.VITE_API_URL || '';
+            const fullUrl = fileUrl.startsWith('http') ? fileUrl : `${API_URL}${fileUrl}`;
+
+            const response = await fetch(fullUrl);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `glidex-${car.brand}-${car.model}-showcase.mp4`.replace(/\s+/g, '-').toLowerCase();
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        } catch (error) {
+            console.error('Download failed:', error);
+            const API_URL = import.meta.env.VITE_API_URL || '';
+            const fullUrl = fileUrl.startsWith('http') ? fileUrl : `${API_URL}${fileUrl}`;
+            window.open(fullUrl, '_blank');
         }
     };
 
@@ -321,28 +355,33 @@ export default function CarDetailPage() {
                                         </div>
                                         <div>
                                             {showcaseUrl ? (
-                                                <a
-                                                    href={`/api/download?url=${encodeURIComponent(showcaseUrl)}`}
-                                                    className="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors"
+                                                <button
+                                                    onClick={handleDownloadExisting}
+                                                    disabled={isDownloading}
+                                                    className="inline-flex items-center px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-xl hover:bg-gray-800 transition-colors disabled:opacity-70"
                                                 >
-                                                    <Film className="w-4 h-4 mr-2" />
-                                                    Download MP4
-                                                </a>
+                                                    {isDownloading ? (
+                                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                                    ) : (
+                                                        <Film className="w-4 h-4 mr-2" />
+                                                    )}
+                                                    {isDownloading ? 'Downloading...' : 'Download MP4'}
+                                                </button>
                                             ) : (
                                                 <button
-                                                    onClick={handleGenerateVideo}
-                                                    disabled={renderStatus === 'rendering'}
+                                                    onClick={handleGenerateAndDownload}
+                                                    disabled={renderStatus === 'rendering' || isDownloading}
                                                     className="inline-flex items-center px-4 py-2 bg-[#D7A04D] text-white text-sm font-medium rounded-xl hover:bg-[#c29045] transition-colors disabled:opacity-70"
                                                 >
-                                                    {renderStatus === 'rendering' ? (
+                                                    {(renderStatus === 'rendering' || isDownloading) ? (
                                                         <>
                                                             <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                                                            Rendering locally...
+                                                            Generate & Download...
                                                         </>
                                                     ) : (
                                                         <>
                                                             <Film className="w-4 h-4 mr-2" />
-                                                            Generate MP4
+                                                            Generate & Download MP4
                                                         </>
                                                     )}
                                                 </button>
