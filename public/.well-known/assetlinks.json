@@ -1,0 +1,15 @@
+[
+    {
+        "relation": [
+            "delegate_permission/common.handle_all_urls",
+            "delegate_permission/common.get_login_creds"
+        ],
+        "target": {
+            "namespace": "android_app",
+            "package_name": "com.anonymous.GlideX",
+            "sha256_cert_fingerprints": [
+                "DD:42:E9:D2:71:28:09:E4:72:24:E3:1E:E6:5D:53:90:56:13:7B:A0:2F:56:2C:74:95:C1:0F:0F:8B:9C"
+            ]
+        }
+    }
+]
