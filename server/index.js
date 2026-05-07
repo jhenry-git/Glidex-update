@@ -195,8 +195,13 @@ app.post('/api/render-car-video', async (req, res) => {
             // ── QuickTime + social media compatibility ──
             // yuv420p is required for QuickTime Player, Instagram, TikTok, WhatsApp
             pixelFormat: 'yuv420p',
-            // CRF 18 = visually lossless, fast encode, small-ish file
-            crf: 18,
+            // Speed up encoding significantly:
+            x264Preset: 'superfast', // Options: ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
+            crf: 23, // 23 is default, perfectly fine for social media. 18 is visually lossless but slower and larger.
+            
+            // Bypass the download step on Render by using the pre-installed Chromium from the Dockerfile
+            chromiumExecutablePath: '/usr/bin/chromium',
+            
             onProgress: ({ progress }) => {
                 console.log(`Rendering progress: ${Math.floor(progress * 100)}%`);
             },
