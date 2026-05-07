@@ -63,23 +63,62 @@ export default function CarDetailPage() {
 
     const executeDownload = async (fileUrl: string) => {
         if (!car) return;
-        try {
-            const API_URL = import.meta.env.VITE_API_URL || '';
-            const fullUrl = fileUrl.startsWith('http') ? fileUrl : `${API_URL}${fileUrl}`;
+        const friendlyName = `glidex-${car.brand}-${car.model}-showcase.mp4`
+            .replace(/\s+/g, '-')
+            .toLowerCase();
 
-            const response = await fetch(fullUrl);
-            const blob = await response.blob();
-            const url = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `glidex-${car.brand}-${car.model}-showcase.mp4`.replace(/\s+/g, '-').toLowerCase();
-            document.body.appendChild(a);
-            a.click();
-            window.URL.revokeObjectURL(url);
-            document.body.removeChild(a);
+        try {
+            // Use the dedicated download endpoint which sets correct Content-Type
+            // and Content-Disposition headers for proper MP4 downloads
+            const API_URL = import.meta.env.VITE_API_URL || '';
+
+            // If the URL is a relative /renders/ path, use our download API
+            if (fileUrl.startsWith('/renders/')) {
+                const downloadUrl = `${API_URL}/api/download?url=${encodeURIComponent(fileUrl)}&name=${encodeURIComponent(friendlyName)}`;
+                const response = await fetch(downloadUrl);
+
+                if (!response.ok) {
+                    throw new Error(`Download failed: ${response.status}`);
+                }
+
+                // Ensure we get it as a proper video/mp4 blob
+                const blob = await response.blob();
+                const videoBlob = new Blob([blob], { type: 'video/mp4' });
+                const url = window.URL.createObjectURL(videoBlob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = friendlyName;
+                document.body.appendChild(a);
+                a.click();
+
+                // Cleanup after a short delay to ensure download starts
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                }, 1000);
+            } else {
+                // For full URLs (e.g., from Supabase storage), fetch and download directly
+                const fullUrl = fileUrl.startsWith('http') ? fileUrl : `${API_URL}${fileUrl}`;
+                const response = await fetch(fullUrl);
+                const blob = await response.blob();
+                const videoBlob = new Blob([blob], { type: 'video/mp4' });
+                const url = window.URL.createObjectURL(videoBlob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = friendlyName;
+                document.body.appendChild(a);
+                a.click();
+
+                setTimeout(() => {
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                }, 1000);
+            }
         } catch (error) {
             console.error('Download failed:', error);
+            // Fallback: open in new tab for manual save
             const API_URL = import.meta.env.VITE_API_URL || '';
             const fullUrl = fileUrl.startsWith('http') ? fileUrl : `${API_URL}${fileUrl}`;
             window.open(fullUrl, '_blank');
