@@ -199,6 +199,11 @@ app.post('/api/render-car-video', async (req, res) => {
             x264Preset: 'superfast', // Options: ultrafast, superfast, veryfast, faster, fast, medium, slow, slower, veryslow
             crf: 23, // 23 is default, perfectly fine for social media. 18 is visually lossless but slower and larger.
             
+            // Limit concurrency to prevent Out of Memory (OOM) crashes on low-tier instances
+            concurrency: 1,
+            // Increase timeout for slow CPU/network image fetching
+            timeoutInMilliseconds: 120000, // 2 minutes per frame timeout instead of 30s
+            
             // Bypass the download step on Render by using the pre-installed Chromium from the Dockerfile
             chromiumExecutablePath: '/usr/bin/chromium',
             
