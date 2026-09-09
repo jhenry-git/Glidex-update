@@ -1,7 +1,7 @@
 /**
  * SignDocumentPage — Smart Document Review, Edit & Sign Page
  *
- * Complete redesign with step-based workflow:
+ * Complete redesign with step-based workflow for secure document signing:
  *   1. Review — View the full document
  *   2. Fill — Complete all required fields with auto-save
  *   3. Sign — Draw, type, or upload signature + consent
@@ -9,11 +9,15 @@
  *
  * Features:
  *   - Progress tracking with stepper UI
- *   - Auto-save with debounced writes
- *   - Field validation with error highlighting
- *   - Multi-mode signature capture
- *   - IP/device logging on submission
+ *   - Auto-save with debounced writes to prevent data loss
+ *   - Field validation with visual error highlighting
+ *   - Multi-mode signature capture (draw, type, upload)
+ *   - IP/device logging on submission for audit trail
  *   - Mobile-first responsive layout
+ *   - Integration with Supabase for persistent form state
+ *
+ * @route GET /sign/:id - Document signing interface
+ * @param id - Document request ID from URL parameters
  */
 
 import { useParams } from 'react-router-dom';
@@ -35,6 +39,7 @@ import SigningProgress, { type SigningStep, type SaveStatus } from '@/components
 import DocumentOverlayViewer from '@/components/signing/DocumentOverlayViewer';
 import { FieldGroupRenderer } from '@/components/signing/FieldRenderer';
 import { GLIDEX_HOST_CONTRACT_FIELDS, type OverlayField } from '@/lib/signing/contractFieldMap';
+import { PageShell } from '@/components/signing/PageShell';
 import {
     fetchDocumentRequest,
     submitSignature,
@@ -84,62 +89,85 @@ export default function SignDocumentPage() {
         [overlayFields, formData]
     );
 
-    // Update a form field value + trigger auto-save
-    const updateFormField = useCallback(
-        (fieldId: string, value: string) => {
-            setFormData((prev) => {
-                const next = { ...prev, [fieldId]: value };
-                // Auto-save to Supabase
-                if (docRequest?.id) {
-                    saveFormProgress(docRequest.id, next, (status) => {
-                        if (status === 'saving') setSaveStatus('saving');
-                        else if (status === 'saved') {
-                            setSaveStatus('saved');
-                            setTimeout(() => setSaveStatus('idle'), 3000);
-                        } else {
-                            setSaveStatus('error');
-                        }
-                    });
-                }
-                return next;
-            });
-        },
-        [docRequest?.id]
-    );
+     // Update a form field value + trigger auto-save
+     const updateFormField = useCallback(
+         (fieldId: string, value: string) => {
+             setFormData((prev) => {
+                 const next = { ...prev, [fieldId]: value };
+                 // Auto-save to Supabase
+                 if (docRequest?.id) {
+                     saveFormProgress(docRequest.id, next, (status) => {
+                         if (status === 'saving') setSaveStatus('saving');
+                         else if (status === 'saved') {
+                             setSaveStatus('saved');
+                             setTimeout(() => setSaveStatus('idle'), 3000);
+                         } else {
+                             setSaveStatus('error');
+                         }
+                     });
+                 }
+                 return next;
+             });
+         },
+         [docRequest]
+     );
 
-    // Load document on mount
-    useEffect(() => {
-        if (!id) {
-            setErrorMessage('Invalid document link.');
-            setPageState('error');
-            return;
-        }
+     // Load document on mount
+     useEffect(() => {
+         let isMounted = true;
 
-        (async () => {
-            const { data, error } = await fetchDocumentRequest(id);
+         async function loadDocument() {
+             if (!id) {
+                 if (isMounted) {
+                     setErrorMessage('Invalid document link.');
+                     setPageState('error');
+                 }
+                 return;
+             }
 
-            if (error && data?.status === 'signed') {
-                setDocRequest(data);
-                setPageState('signed');
-                return;
-            }
+             try {
+                 const { data, error } = await fetchDocumentRequest(id);
 
-            if (error || !data) {
-                setErrorMessage(error || 'Document not found.');
-                setPageState('error');
-                return;
-            }
+                 if (!isMounted) return;
 
-            setDocRequest(data);
+                 if (error && data?.status === 'signed') {
+                     setDocRequest(data);
+                     setPageState('signed');
+                     return;
+                 }
 
-            // Restore saved form progress
-            if (data.form_field_responses && Object.keys(data.form_field_responses).length > 0) {
-                setFormData(data.form_field_responses);
-            }
+                 if (error || !data) {
+                     if (isMounted) {
+                         setErrorMessage(error || 'Document not found.');
+                         setPageState('error');
+                     }
+                     return;
+                 }
 
-            setPageState('ready');
-        })();
-    }, [id]);
+                 setDocRequest(data);
+
+                 // Restore saved form progress
+                 if (data.form_field_responses && Object.keys(data.form_field_responses).length > 0) {
+                     setFormData(data.form_field_responses);
+                 }
+
+                 if (isMounted) {
+                     setPageState('ready');
+                 }
+             } catch {
+                 if (isMounted) {
+                     setErrorMessage('Failed to load document. Please try again.');
+                     setPageState('error');
+                 }
+             }
+         }
+
+         loadDocument();
+
+         return () => {
+             isMounted = false;
+         };
+     }, [id]);
 
     // Step navigation
     const goToNextStep = () => {
@@ -495,40 +523,11 @@ export default function SignDocumentPage() {
                     </div>
                 )}
 
-                {/* Footer */}
-                <p className="text-center text-xs text-gray-400">
-                    Powered by <span className="font-semibold text-gray-500">GlideX</span> · Secure Electronic Signing
-                </p>
-            </div>
-        </PageShell>
-    );
-}
-
-// ─── Layout Shell ─────────────────────────────────────────────
-
-function PageShell({ children }: { children: React.ReactNode }) {
-    return (
-        <div className="min-h-screen bg-[#F4F6F8]">
-            {/* Minimal header */}
-            <header className="bg-white border-b border-gray-200 sticky top-0 z-50">
-                <div className="max-w-4xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-lg bg-[#111111] flex items-center justify-center">
-                            <span className="text-white text-xs font-bold">GX</span>
-                        </div>
-                        <span className="text-sm font-semibold text-gray-900 tracking-tight">
-                            GlideX
-                        </span>
-                    </div>
-                    <div className="flex items-center gap-1.5 text-xs text-gray-400">
-                        <Lock className="w-3 h-3" />
-                        <span className="font-mono">Secure Signing</span>
-                    </div>
-                </div>
-            </header>
-
-            {/* Content */}
-            <main className="max-w-4xl mx-auto px-4 sm:px-6">{children}</main>
-        </div>
-    );
-}
+                 {/* Footer */}
+                 <p className="text-center text-xs text-gray-400">
+                     Powered by <span className="font-semibold text-gray-500">GlideX</span> · Secure Electronic Signing
+                 </p>
+             </div>
+         </PageShell>
+     );
+ }

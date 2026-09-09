@@ -25,3 +25,15 @@ dist-ssr
 
 # Local Remotion Renders
 public/renders/*.mp4
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Databases and confidential ledger files
+*.db
+*.sqlite
+*.sqlite3
+Finance/*.db
+

@@ -10,6 +10,9 @@
  * The GSign admin app generates links like /sign/{signing_token}.
  * We query by `signing_token` to find the record, then use the
  * record's `id` for submission to the Edge Function.
+ *
+ * @module signingService
+ * @description Core service layer for document signing workflow
  */
 
 import { supabaseSigning } from './supabaseSigningClient';
@@ -27,6 +30,10 @@ export interface FormField {
     leftPct?: number;
     widthPct?: number;
     fontSize?: number;
+    // Optional properties for number fields
+    min?: number;
+    max?: number;
+    step?: number;
 }
 
 export interface DocumentRequest {

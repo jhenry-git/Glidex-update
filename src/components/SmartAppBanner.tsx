@@ -47,7 +47,7 @@ export const SmartAppBanner: React.FC = () => {
         : 'https://play.google.com/store/apps/details?id=com.anonymous.GlideX&hl=en';
 
     return (
-        <div className="fixed top-0 left-0 right-0 z-[9999] bg-white border-b border-gray-200 shadow-sm flex items-center px-4 py-3 transform transition-transform duration-300 ease-in-out">
+        <div className="fixed top-0 left-0 right-0 z-[9999] bg-white border-b border-gray-200 shadow-sm flex items-center px-4 py-3 transform transition-transform duration-300 ease-in-out print:hidden">
             <button
                 onClick={handleDismiss}
                 className="text-gray-400 hover:text-gray-600 mr-3 flex-shrink-0"

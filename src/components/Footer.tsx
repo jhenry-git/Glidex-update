@@ -6,6 +6,7 @@ const footerLinks = [
     { label: 'Hosts', href: '#verified', isAnchor: true },
     { label: 'Support', href: '#support', isAnchor: true },
     { label: 'Browse Cars', href: '/listings', isAnchor: false },
+    { label: 'Founder Profile', href: '/founder', isAnchor: false },
     { label: 'List your car', href: '#host', isAnchor: true },
 ];
 

@@ -39,11 +39,16 @@ export function useVideoGeneration(carId: string | undefined) {
             // A more elegant approach is to return the URL:
             return data.outputUrl;
 
-        } catch (err: any) {
-            console.error('Video generation error:', err);
-            setError(err.message || 'An unexpected error occurred during rendering.');
-            setStatus('error');
-        }
+         } catch (err: unknown) {
+             if (err instanceof Error) {
+                 console.error('Video generation error:', err);
+                 setError(err.message || 'An unexpected error occurred during rendering.');
+             } else {
+                 console.error('Video generation error:', err);
+                 setError('An unexpected error occurred during rendering.');
+             }
+             setStatus('error');
+         }
     }, [carId]);
 
     const reset = useCallback(() => {

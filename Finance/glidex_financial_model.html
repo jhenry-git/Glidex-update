@@ -1,0 +1,744 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>GlideX: Historical &amp; Projected Financial Model</title>
+  <meta name="robots" content="noindex, nofollow, noarchive">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            display: ['Montserrat', 'sans-serif'],
+            mono: ['IBM Plex Mono', 'monospace'],
+          },
+          colors: {
+            brand: {
+              black: '#0B0F17',
+              gold: '#D7A04D',
+              blue: '#2563EB',
+              surface: '#F8FAFC',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @media print {
+      @page {
+        size: A4 portrait;
+        margin: 10mm 12mm 10mm 12mm;
+      }
+      body {
+        background: #ffffff !important;
+        color: #0B0F17 !important;
+        font-size: 8.5pt !important;
+        line-height: 1.35 !important;
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
+      .no-print {
+        display: none !important;
+      }
+      .page-break {
+        page-break-before: always !important;
+        break-before: page !important;
+      }
+      .avoid-break {
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+      }
+      .print-shadow-none {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        max-width: 100% !important;
+      }
+      table {
+        font-size: 7.8pt !important;
+      }
+      th, td {
+        padding: 3.5px 5px !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-[#F1F5F9] text-[#0B0F17] font-sans antialiased min-h-screen p-4 sm:p-8">
+
+  <!-- Interactive Control Bar (Hidden in Print / PDF) -->
+  <aside aria-label="Financial model controls" class="max-w-5xl mx-auto mb-6 bg-white border border-slate-200 rounded-2xl shadow-sm p-4 sm:p-5 no-print">
+    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-100 pb-4 mb-4">
+      <div>
+        <div class="flex items-center gap-2">
+          <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+          <span class="text-xs font-mono font-semibold uppercase tracking-wider text-slate-500">Internal Financial Modeling Engine</span>
+        </div>
+        <h1 class="text-lg font-display font-bold text-[#0B0F17] mt-0.5">GlideX Financial Model &amp; Projections</h1>
+      </div>
+      <div class="flex items-center gap-3">
+        <button onclick="resetDefaults()" class="px-3.5 py-1.5 rounded-lg border border-slate-200 text-xs font-medium text-slate-600 hover:bg-slate-50 transition">
+          Reset Assumptions
+        </button>
+        <button onclick="window.print()" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0B0F17] hover:bg-slate-800 text-white text-xs font-semibold shadow transition">
+          <svg class="w-4 h-4 text-[#D7A04D]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4H7v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/></svg>
+          Export Official A4 PDF
+        </button>
+      </div>
+    </div>
+
+    <!-- Live Assumption Tuners -->
+    <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+        <label for="input-daily-rate" class="block font-medium text-slate-600 mb-1">Avg Daily Rate (KES)</label>
+        <input type="number" id="input-daily-rate" value="5500" step="500" min="3000" max="15000" oninput="updateModel()" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 font-mono font-semibold text-[#0B0F17]">
+      </div>
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+        <label for="input-trip-days" class="block font-medium text-slate-600 mb-1">Avg Trip Length (Days)</label>
+        <input type="number" id="input-trip-days" value="3.0" step="0.5" min="1" max="10" oninput="updateModel()" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 font-mono font-semibold text-[#0B0F17]">
+      </div>
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+        <label for="input-take-rate" class="block font-medium text-slate-600 mb-1">Platform Take Rate (%)</label>
+        <input type="number" id="input-take-rate" value="18.0" step="1.0" min="10" max="30" oninput="updateModel()" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 font-mono font-semibold text-[#0B0F17]">
+      </div>
+      <div class="bg-slate-50 p-3 rounded-xl border border-slate-100">
+        <label for="input-bookings-pm" class="block font-medium text-slate-600 mb-1">Trips / Active Car / Mo</label>
+        <input type="number" id="input-bookings-pm" value="4.0" step="0.5" min="1" max="10" oninput="updateModel()" class="w-full bg-white border border-slate-200 rounded-lg px-2.5 py-1 font-mono font-semibold text-[#0B0F17]">
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Report Document Container (Rendered to A4 PDF) -->
+  <main class="max-w-5xl mx-auto bg-white rounded-2xl shadow-md border border-slate-200/90 p-8 sm:p-12 print-shadow-none">
+
+    <!-- Confidentiality Banner -->
+    <div class="bg-rose-50 border border-rose-200 rounded-xl px-4 py-2.5 mb-6 text-center text-xs font-mono font-semibold text-rose-700 tracking-wide">
+      CONFIDENTIAL BUSINESS INFORMATION &bull; PREPARED FOR EVALUATION PURPOSES ONLY &bull; NOT FOR PUBLIC DISTRIBUTION
+    </div>
+
+    <!-- Header Section -->
+    <header class="border-b-2 border-slate-900 pb-5 mb-6 flex flex-wrap items-center justify-between gap-4 avoid-break">
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-[#0B0F17] flex items-center justify-center text-white font-display font-black text-xl">
+          GX
+        </div>
+        <div>
+          <h2 class="font-display font-bold text-2xl tracking-tight text-[#0B0F17]">
+            GlideX Mobility Limited
+          </h2>
+          <span class="text-xs font-mono uppercase tracking-wider text-slate-500 block">
+            Executive Financial Model &bull; Historical &amp; 5-Year Projections (2026-2030)
+          </span>
+        </div>
+      </div>
+      <div class="text-right text-xs">
+        <span class="font-mono text-[10px] text-[#D7A04D] uppercase font-bold tracking-widest block">Incubation &amp; Investor Dossier</span>
+        <span class="text-slate-600 font-medium">Currency: Kenya Shillings (KES)</span>
+        <span class="text-slate-400 text-[10px] block">Baseline FX: 1 USD &asymp; 130 KES</span>
+      </div>
+    </header>
+
+    <!-- SECTION 1: Historical Financial Summary -->
+    <section class="mb-8 avoid-break">
+      <div class="flex items-center justify-between mb-3 border-b border-slate-200 pb-1.5">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-[#D7A04D]"></span>
+          <h3 class="text-xs font-mono uppercase tracking-widest font-bold text-[#0B0F17]">1. Historical Financial Summary (Actual Records)</h3>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-bold">SOURCE: GLIDEX FINANCE LEDGER [ACTUAL]</span>
+      </div>
+
+      <p class="text-xs text-slate-600 mb-3 leading-relaxed">
+        Actual transactions recorded in the GlideX financial ledger covering initial operational testing in 2023 and the expanded 2026 pilot program in Nairobi. All figures represent verified cashflow receipts and bank/M-Pesa settlements.
+      </p>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left border-collapse border border-slate-200 mb-3">
+          <thead>
+            <tr class="bg-slate-100 text-slate-700 font-mono text-[11px] uppercase">
+              <th class="border border-slate-200 p-2">Period / Phase</th>
+              <th class="border border-slate-200 p-2">Data Status</th>
+              <th class="border border-slate-200 p-2 text-right">Gross Income (KES)</th>
+              <th class="border border-slate-200 p-2 text-right">Operating Expenses (KES)</th>
+              <th class="border border-slate-200 p-2 text-right">Operating Net (KES)</th>
+              <th class="border border-slate-200 p-2 text-right">Financing / Loans (KES)</th>
+              <th class="border border-slate-200 p-2 text-right">Net Cashflow (KES)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 font-mono">
+            <tr class="hover:bg-slate-50">
+              <td class="border border-slate-200 p-2 font-sans font-medium text-slate-900">2023 Initial Prototype Testing</td>
+              <td class="border border-slate-200 p-2"><span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-50 text-emerald-700 font-semibold">[Actual]</span></td>
+              <td class="border border-slate-200 p-2 text-right">1,020</td>
+              <td class="border border-slate-200 p-2 text-right">(1,690)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-600">(670)</td>
+              <td class="border border-slate-200 p-2 text-right">0</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-600">(670)</td>
+            </tr>
+            <tr class="hover:bg-slate-50">
+              <td class="border border-slate-200 p-2 font-sans font-medium text-slate-900">2026 Q1 Pilot Launch (To Date)</td>
+              <td class="border border-slate-200 p-2"><span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-50 text-emerald-700 font-semibold">[Actual]</span></td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-emerald-700">68,198</td>
+              <td class="border border-slate-200 p-2 text-right">(36,494)</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-emerald-700">+31,704</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-500">(17,996)</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-emerald-700">+13,708</td>
+            </tr>
+            <tr class="bg-slate-50 font-bold">
+              <td class="border border-slate-200 p-2 font-sans">Cumulative Ledger Actuals</td>
+              <td class="border border-slate-200 p-2"><span class="px-1.5 py-0.5 rounded text-[10px] bg-emerald-100 text-emerald-800">[Actual Total]</span></td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-700">69,218</td>
+              <td class="border border-slate-200 p-2 text-right">(38,184)</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-700">+31,034</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600">(17,996)</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-700">+13,038</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Itemized Historical Expense Composition -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono">
+        <div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70">
+          <span class="text-slate-500 text-[10px] uppercase block">Operational &amp; Logistics</span>
+          <span class="font-bold text-slate-800">KES 17,987 (47.1%)</span>
+        </div>
+        <div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70">
+          <span class="text-slate-500 text-[10px] uppercase block">Fuel &amp; Fleet Movement</span>
+          <span class="font-bold text-slate-800">KES 7,085 (18.6%)</span>
+        </div>
+        <div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70">
+          <span class="text-slate-500 text-[10px] uppercase block">Telecommunications &amp; WiFi</span>
+          <span class="font-bold text-slate-800">KES 4,150 (10.9%)</span>
+        </div>
+        <div class="p-2.5 rounded-lg border border-slate-200 bg-slate-50/70">
+          <span class="text-slate-500 text-[10px] uppercase block">Operations Admin &amp; Field</span>
+          <span class="font-bold text-slate-800">KES 8,962 (23.4%)</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: Key Operational Drivers & Assumptions -->
+    <section class="mb-8 avoid-break">
+      <div class="flex items-center justify-between mb-3 border-b border-slate-200 pb-1.5">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-[#D7A04D]"></span>
+          <h3 class="text-xs font-mono uppercase tracking-widest font-bold text-[#0B0F17]">2. Key Financial Assumptions &amp; Operational Drivers</h3>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-bold">DRIVER-BASED REVENUE MODEL</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left border-collapse border border-slate-200">
+          <thead>
+            <tr class="bg-slate-100 text-slate-700 font-mono text-[11px] uppercase">
+              <th class="border border-slate-200 p-2">Driver Metric</th>
+              <th class="border border-slate-200 p-2 text-center">Unit</th>
+              <th class="border border-slate-200 p-2 text-right">2026 (Y1)</th>
+              <th class="border border-slate-200 p-2 text-right">2027 (Y2)</th>
+              <th class="border border-slate-200 p-2 text-right">2028 (Y3)</th>
+              <th class="border border-slate-200 p-2 text-right">2029 (Y4)</th>
+              <th class="border border-slate-200 p-2 text-right">2030 (Y5)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 font-mono text-slate-800">
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans font-medium">Total Listed Vehicles (Inventory)</td>
+              <td class="border border-slate-200 p-2 text-center text-slate-500">Vehicles</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-listed-0">250</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-listed-1">850</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-listed-2">2,400</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-listed-3">5,500</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-listed-4">11,000</td>
+            </tr>
+            <tr class="bg-slate-50/50">
+              <td class="border border-slate-200 p-2 font-sans font-medium">Monthly Active Renting Fleet (Utilization Base)</td>
+              <td class="border border-slate-200 p-2 text-center text-slate-500">Vehicles</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-[#0B0F17]" id="drv-active-0">120</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-[#0B0F17]" id="drv-active-1">450</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-[#0B0F17]" id="drv-active-2">1,350</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-[#0B0F17]" id="drv-active-3">3,300</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-[#0B0F17]" id="drv-active-4">6,800</td>
+            </tr>
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans font-medium">Average Bookings per Active Vehicle / Month</td>
+              <td class="border border-slate-200 p-2 text-center text-slate-500">Trips / Mo</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-tripspm-0">4.0</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-tripspm-1">4.0</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-tripspm-2">4.0</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-tripspm-3">4.0</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-tripspm-4">4.2</td>
+            </tr>
+            <tr class="bg-slate-50/50">
+              <td class="border border-slate-200 p-2 font-sans font-medium">Total Completed Bookings / Year</td>
+              <td class="border border-slate-200 p-2 text-center text-slate-500">Bookings</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-blue-700" id="drv-bookings-0">5,760</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-blue-700" id="drv-bookings-1">21,600</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-blue-700" id="drv-bookings-2">64,800</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-blue-700" id="drv-bookings-3">158,400</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-blue-700" id="drv-bookings-4">342,720</td>
+            </tr>
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans font-medium">Average Daily Rental Price (ADR)</td>
+              <td class="border border-slate-200 p-2 text-center text-slate-500">KES / Day</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-adr-0">5,500</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-adr-1">5,500</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-adr-2">5,600</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-adr-3">5,700</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-adr-4">5,800</td>
+            </tr>
+            <tr class="bg-slate-50/50">
+              <td class="border border-slate-200 p-2 font-sans font-medium">Average Rental Duration</td>
+              <td class="border border-slate-200 p-2 text-center text-slate-500">Days</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-dur-0">3.0</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-dur-1">3.0</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-dur-2">3.0</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-dur-3">3.0</td>
+              <td class="border border-slate-200 p-2 text-right" id="drv-dur-4">3.0</td>
+            </tr>
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans font-medium">Gross Booking Value (GBV) per Trip</td>
+              <td class="border border-slate-200 p-2 text-center text-slate-500">KES / Trip</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="drv-gbvtrip-0">16,500</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="drv-gbvtrip-1">16,500</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="drv-gbvtrip-2">16,800</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="drv-gbvtrip-3">17,100</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="drv-gbvtrip-4">17,400</td>
+            </tr>
+            <tr class="bg-slate-50/50">
+              <td class="border border-slate-200 p-2 font-sans font-medium">GlideX Blended Platform Take Rate</td>
+              <td class="border border-slate-200 p-2 text-center text-slate-500">% of GBV</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-[#D7A04D]" id="drv-take-0">18.0%</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-[#D7A04D]" id="drv-take-1">18.0%</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-[#D7A04D]" id="drv-take-2">18.0%</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-[#D7A04D]" id="drv-take-3">18.0%</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-[#D7A04D]" id="drv-take-4">18.0%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PAGE BREAK FOR CLEAN A4 EXPORT -->
+    <div class="page-break"></div>
+
+    <!-- SECTION 3: 5-Year Projected Income Statement (P&L) -->
+    <section class="mb-8 avoid-break">
+      <div class="flex items-center justify-between mb-3 border-b border-slate-200 pb-1.5">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-[#D7A04D]"></span>
+          <h3 class="text-xs font-mono uppercase tracking-widest font-bold text-[#0B0F17]">3. Projected Income Statement (5-Year P&amp;L)</h3>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-bold">VALUES IN KES ('000s)</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left border-collapse border border-slate-200 font-mono">
+          <thead>
+            <tr class="bg-slate-100 text-slate-700 text-[11px] uppercase">
+              <th class="border border-slate-200 p-2 font-sans">Line Item</th>
+              <th class="border border-slate-200 p-2 text-right">2026 (Y1)<br><span class="text-[9px] text-slate-400 font-normal">[Est]</span></th>
+              <th class="border border-slate-200 p-2 text-right">2027 (Y2)<br><span class="text-[9px] text-slate-400 font-normal">[Proj]</span></th>
+              <th class="border border-slate-200 p-2 text-right">2028 (Y3)<br><span class="text-[9px] text-slate-400 font-normal">[Proj]</span></th>
+              <th class="border border-slate-200 p-2 text-right">2029 (Y4)<br><span class="text-[9px] text-slate-400 font-normal">[Proj]</span></th>
+              <th class="border border-slate-200 p-2 text-right">2030 (Y5)<br><span class="text-[9px] text-slate-400 font-normal">[Proj]</span></th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 text-slate-800">
+            <!-- Gross Booking Value -->
+            <tr class="bg-slate-50/70">
+              <td class="border border-slate-200 p-2 font-sans font-bold text-slate-900">Gross Booking Value (GBV)</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="pl-gbv-0">95,040</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="pl-gbv-1">356,400</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="pl-gbv-2">1,088,640</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="pl-gbv-3">2,708,640</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="pl-gbv-4">5,963,328</td>
+            </tr>
+            <!-- Net Platform Revenue -->
+            <tr class="bg-blue-50/60 font-bold">
+              <td class="border border-slate-200 p-2 font-sans text-blue-900">GlideX Net Revenue (Platform Take)</td>
+              <td class="border border-slate-200 p-2 text-right text-blue-900" id="pl-rev-0">17,107</td>
+              <td class="border border-slate-200 p-2 text-right text-blue-900" id="pl-rev-1">64,152</td>
+              <td class="border border-slate-200 p-2 text-right text-blue-900" id="pl-rev-2">195,955</td>
+              <td class="border border-slate-200 p-2 text-right text-blue-900" id="pl-rev-3">487,555</td>
+              <td class="border border-slate-200 p-2 text-right text-blue-900" id="pl-rev-4">1,073,399</td>
+            </tr>
+            <!-- Cost of Revenue -->
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans text-slate-600 pl-4">Payment Processing &amp; Verification (3.0%)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-600" id="pl-cor-0">(2,851)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-600" id="pl-cor-1">(10,692)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-600" id="pl-cor-2">(32,659)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-600" id="pl-cor-3">(81,259)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-600" id="pl-cor-4">(178,900)</td>
+            </tr>
+            <tr class="bg-slate-50 font-semibold">
+              <td class="border border-slate-200 p-2 font-sans text-slate-900">Gross Profit</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="pl-gp-0">14,256</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="pl-gp-1">53,460</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="pl-gp-2">163,296</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="pl-gp-3">406,296</td>
+              <td class="border border-slate-200 p-2 text-right font-bold text-slate-900" id="pl-gp-4">894,499</td>
+            </tr>
+            <!-- Operating Expenses -->
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans font-semibold text-slate-700" colspan="6">Operating Expenses (OPEX):</td>
+            </tr>
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans text-slate-600 pl-4">Technology, Cloud &amp; Infrastructure</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-tech-0">(1,800)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-tech-1">(4,200)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-tech-2">(10,800)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-tech-3">(24,000)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-tech-4">(48,000)</td>
+            </tr>
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans text-slate-600 pl-4">Marketing &amp; Customer/Host Acquisition</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-mkt-0">(4,200)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-mkt-1">(15,000)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-mkt-2">(38,000)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-mkt-3">(85,000)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-mkt-4">(170,000)</td>
+            </tr>
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans text-slate-600 pl-4">Salaries &amp; Key Personnel</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-staff-0">(4,800)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-staff-1">(14,400)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-staff-2">(36,000)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-staff-3">(84,000)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-staff-4">(168,000)</td>
+            </tr>
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans text-slate-600 pl-4">Administration, Legal &amp; Compliance</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-adm-0">(1,200)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-adm-1">(3,600)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-adm-2">(9,600)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-adm-3">(20,000)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="pl-adm-4">(42,000)</td>
+            </tr>
+            <!-- Total OPEX -->
+            <tr class="bg-slate-100 font-semibold">
+              <td class="border border-slate-200 p-2 font-sans text-slate-900">Total Operating Expenses (OPEX)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-700" id="pl-opex-0">(12,000)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-700" id="pl-opex-1">(37,200)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-700" id="pl-opex-2">(94,400)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-700" id="pl-opex-3">(213,000)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-700" id="pl-opex-4">(428,000)</td>
+            </tr>
+            <!-- EBITDA -->
+            <tr class="bg-emerald-50/70 font-bold">
+              <td class="border border-slate-200 p-2 font-sans text-emerald-950">EBITDA</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-800" id="pl-ebitda-0">+2,256</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-800" id="pl-ebitda-1">+16,260</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-800" id="pl-ebitda-2">+68,896</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-800" id="pl-ebitda-3">+193,296</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-800" id="pl-ebitda-4">+466,499</td>
+            </tr>
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans text-slate-500 pl-4">EBITDA Margin (%)</td>
+              <td class="border border-slate-200 p-2 text-right font-medium text-slate-700" id="pl-ebmargin-0">13.2%</td>
+              <td class="border border-slate-200 p-2 text-right font-medium text-slate-700" id="pl-ebmargin-1">25.3%</td>
+              <td class="border border-slate-200 p-2 text-right font-medium text-slate-700" id="pl-ebmargin-2">35.2%</td>
+              <td class="border border-slate-200 p-2 text-right font-medium text-slate-700" id="pl-ebmargin-3">39.6%</td>
+              <td class="border border-slate-200 p-2 text-right font-medium text-slate-700" id="pl-ebmargin-4">43.5%</td>
+            </tr>
+            <!-- Depreciation & Taxes -->
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans text-slate-600 pl-4">Depreciation &amp; Amortization</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-500" id="pl-dep-0">(350)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-500" id="pl-dep-1">(950)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-500" id="pl-dep-2">(2,400)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-500" id="pl-dep-3">(5,500)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-500" id="pl-dep-4">(11,000)</td>
+            </tr>
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans text-slate-600 pl-4">Corporate Income Tax (Est. 30%)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-500" id="pl-tax-0">(572)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-500" id="pl-tax-1">(4,593)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-500" id="pl-tax-2">(19,949)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-500" id="pl-tax-3">(56,339)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-500" id="pl-tax-4">(136,650)</td>
+            </tr>
+            <!-- Net Profit -->
+            <tr class="bg-slate-900 text-white font-bold">
+              <td class="border border-slate-800 p-2 font-sans">Net Profit / (Loss)</td>
+              <td class="border border-slate-800 p-2 text-right text-emerald-400" id="pl-net-0">+1,334</td>
+              <td class="border border-slate-800 p-2 text-right text-emerald-400" id="pl-net-1">+10,717</td>
+              <td class="border border-slate-800 p-2 text-right text-emerald-400" id="pl-net-2">+46,547</td>
+              <td class="border border-slate-800 p-2 text-right text-emerald-400" id="pl-net-3">+131,457</td>
+              <td class="border border-slate-800 p-2 text-right text-emerald-400" id="pl-net-4">+318,849</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- SECTION 4: Cash Flow Projection -->
+    <section class="mb-8 avoid-break">
+      <div class="flex items-center justify-between mb-3 border-b border-slate-200 pb-1.5">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-[#D7A04D]"></span>
+          <h3 class="text-xs font-mono uppercase tracking-widest font-bold text-[#0B0F17]">4. Cash Flow Projection (5-Year Forecast)</h3>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-bold">VALUES IN KES ('000s)</span>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-xs text-left border-collapse border border-slate-200 font-mono">
+          <thead>
+            <tr class="bg-slate-100 text-slate-700 text-[11px] uppercase">
+              <th class="border border-slate-200 p-2 font-sans">Cash Flow Stream</th>
+              <th class="border border-slate-200 p-2 text-right">2026 (Y1)</th>
+              <th class="border border-slate-200 p-2 text-right">2027 (Y2)</th>
+              <th class="border border-slate-200 p-2 text-right">2028 (Y3)</th>
+              <th class="border border-slate-200 p-2 text-right">2029 (Y4)</th>
+              <th class="border border-slate-200 p-2 text-right">2030 (Y5)</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-slate-200 text-slate-800">
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans font-medium">Operating Cash Flow (OCF)</td>
+              <td class="border border-slate-200 p-2 text-right font-semibold text-emerald-700" id="cf-ocf-0">+1,684</td>
+              <td class="border border-slate-200 p-2 text-right font-semibold text-emerald-700" id="cf-ocf-1">+11,667</td>
+              <td class="border border-slate-200 p-2 text-right font-semibold text-emerald-700" id="cf-ocf-2">+48,947</td>
+              <td class="border border-slate-200 p-2 text-right font-semibold text-emerald-700" id="cf-ocf-3">+136,957</td>
+              <td class="border border-slate-200 p-2 text-right font-semibold text-emerald-700" id="cf-ocf-4">+329,849</td>
+            </tr>
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans text-slate-600 pl-4">Capital Expenditures (Hardware, Verification Gear)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-600" id="cf-capex-0">(600)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-600" id="cf-capex-1">(1,800)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-600" id="cf-capex-2">(4,500)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-600" id="cf-capex-3">(10,000)</td>
+              <td class="border border-slate-200 p-2 text-right text-rose-600" id="cf-capex-4">(20,000)</td>
+            </tr>
+            <tr>
+              <td class="border border-slate-200 p-2 font-sans text-slate-600 pl-4">Working Capital Adjustment</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="cf-wc-0">(400)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="cf-wc-1">(1,200)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="cf-wc-2">(3,200)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="cf-wc-3">(8,000)</td>
+              <td class="border border-slate-200 p-2 text-right text-slate-600" id="cf-wc-4">(15,000)</td>
+            </tr>
+            <tr class="bg-slate-50 font-bold">
+              <td class="border border-slate-200 p-2 font-sans text-slate-900">Net Free Cash Flow (FCF)</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-700" id="cf-fcf-0">+684</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-700" id="cf-fcf-1">+8,667</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-700" id="cf-fcf-2">+41,247</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-700" id="cf-fcf-3">+118,957</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-700" id="cf-fcf-4">+294,849</td>
+            </tr>
+            <tr class="bg-emerald-50 font-bold">
+              <td class="border border-slate-200 p-2 font-sans text-emerald-950">Cumulative Cash Balance (Year-End)</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-900" id="cf-cum-0">+684</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-900" id="cf-cum-1">+9,351</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-900" id="cf-cum-2">+50,598</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-900" id="cf-cum-3">+169,555</td>
+              <td class="border border-slate-200 p-2 text-right text-emerald-900" id="cf-cum-4">+464,404</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PAGE BREAK FOR CLEAN A4 EXPORT -->
+    <div class="page-break"></div>
+
+    <!-- SECTION 5: Key Business Metrics & Unit Economics -->
+    <section class="mb-8 avoid-break">
+      <div class="flex items-center justify-between mb-3 border-b border-slate-200 pb-1.5">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-[#D7A04D]"></span>
+          <h3 class="text-xs font-mono uppercase tracking-widest font-bold text-[#0B0F17]">5. Key Business Metrics &amp; Unit Economics</h3>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-bold">INVESTOR KPIS</span>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs mb-4">
+        <div class="p-3 rounded-xl border border-slate-200 bg-slate-50">
+          <span class="text-[10px] font-mono uppercase text-slate-500 block">Gross Margin</span>
+          <span class="text-base font-mono font-bold text-slate-900" id="kpi-gm">83.3%</span>
+          <span class="text-[10px] text-slate-500 block mt-0.5">Post-payment processing</span>
+        </div>
+        <div class="p-3 rounded-xl border border-slate-200 bg-slate-50">
+          <span class="text-[10px] font-mono uppercase text-slate-500 block">Customer CAC (Blended)</span>
+          <span class="text-base font-mono font-bold text-slate-900">KES 650</span>
+          <span class="text-[10px] text-slate-500 block mt-0.5">Meta &amp; Google digital spend</span>
+        </div>
+        <div class="p-3 rounded-xl border border-slate-200 bg-slate-50">
+          <span class="text-[10px] font-mono uppercase text-slate-500 block">Customer 12M LTV</span>
+          <span class="text-base font-mono font-bold text-emerald-700">KES 4,750</span>
+          <span class="text-[10px] text-slate-500 block mt-0.5">Based on 1.6 trips/year</span>
+        </div>
+        <div class="p-3 rounded-xl border border-slate-200 bg-slate-50">
+          <span class="text-[10px] font-mono uppercase text-slate-500 block">LTV / CAC Ratio</span>
+          <span class="text-base font-mono font-bold text-blue-700">7.3x</span>
+          <span class="text-[10px] text-slate-500 block mt-0.5">Strong venture capital metric</span>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+        <div class="p-3 rounded-xl border border-slate-200 bg-slate-50">
+          <span class="text-[10px] font-mono uppercase text-slate-500 block">Host Acquisition Cost</span>
+          <span class="text-base font-mono font-bold text-slate-900">KES 2,800</span>
+          <span class="text-[10px] text-slate-500 block mt-0.5">Field onboarding &amp; inspection</span>
+        </div>
+        <div class="p-3 rounded-xl border border-slate-200 bg-slate-50">
+          <span class="text-[10px] font-mono uppercase text-slate-500 block">Annual Revenue / Car</span>
+          <span class="text-base font-mono font-bold text-slate-900" id="kpi-revpercar">KES 142,560</span>
+          <span class="text-[10px] text-slate-500 block mt-0.5">Platform take per active vehicle</span>
+        </div>
+        <div class="p-3 rounded-xl border border-slate-200 bg-slate-50">
+          <span class="text-[10px] font-mono uppercase text-slate-500 block">CAC Payback Period</span>
+          <span class="text-base font-mono font-bold text-emerald-700">&lt; 1.5 Months</span>
+          <span class="text-[10px] text-slate-500 block mt-0.5">Fast working capital recycling</span>
+        </div>
+        <div class="p-3 rounded-xl border border-slate-200 bg-slate-50">
+          <span class="text-[10px] font-mono uppercase text-slate-500 block">Fleet Retention Rate</span>
+          <span class="text-base font-mono font-bold text-slate-900">82%</span>
+          <span class="text-[10px] text-slate-500 block mt-0.5">Quarterly host retention</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 6: Summary of Financial Outlook -->
+    <section class="mb-6 avoid-break">
+      <div class="flex items-center justify-between mb-3 border-b border-slate-200 pb-1.5">
+        <div class="flex items-center gap-2">
+          <span class="w-2 h-2 rounded-full bg-[#D7A04D]"></span>
+          <h3 class="text-xs font-mono uppercase tracking-widest font-bold text-[#0B0F17]">6. Executive Summary of Financial Outlook</h3>
+        </div>
+        <span class="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-bold">EVALUATION BRIEFING</span>
+      </div>
+
+      <div class="bg-slate-50/80 rounded-xl p-4 border border-slate-200/80 text-xs text-slate-700 leading-relaxed space-y-2.5">
+        <p>
+          <strong>1. Asset-Light Capital Efficiency:</strong> Because GlideX operates as a two-sided digital mobility marketplace connecting existing private vehicle owners with renters, the company does not incur vehicle acquisition debt, vehicle leasing liabilities, or fleet depreciation costs. Capital is deployed exclusively into platform technology, trust verification, and user acquisition.
+        </p>
+        <p>
+          <strong>2. Fast Path to Unit Profitability:</strong> With an average trip gross booking value of KES 16,500 ($127) and an 18.0% take rate, each rental generates KES 2,970 in net revenue against an estimated blended customer acquisition cost of KES 650. GlideX recovers user acquisition investment within the first completed booking.
+        </p>
+        <p>
+          <strong>3. Scale &amp; Operating Leverage:</strong> As active fleet volume expands from 120 vehicles in Year 1 to 1,350 in Year 3 and 6,800 in Year 5, technology hosting and core staff costs scale at sub-linear rates, expanding EBITDA margins from 13.2% in 2026 to over 40% at scale.
+        </p>
+        <p>
+          <strong>4. Cash Flow &amp; Self-Sustaining Operations:</strong> Operating cash flow turns positive in Year 1 under baseline assumptions, generating cumulative cash reserves of KES 50.5M by Year 3 and KES 464.4M by Year 5, supporting regional expansion across East Africa without continuous dilutive funding rounds.
+        </p>
+      </div>
+    </section>
+
+    <!-- Document Footer with Sign-Off & Confidentiality Notice -->
+    <footer class="pt-4 border-t border-slate-200 text-[10px] font-mono text-slate-500 flex flex-wrap items-center justify-between gap-2 avoid-break">
+      <div>
+        <span class="font-bold text-slate-800">GlideX Mobility Limited</span> &bull; Nairobi, Kenya &bull; glidexp.com
+      </div>
+      <div>
+        Prepared by: <span class="font-bold text-slate-800">Joseph Henry, Founder</span> &bull; support@glidexp.com
+      </div>
+      <div class="w-full text-center text-rose-600 font-bold pt-2 border-t border-slate-100 mt-2">
+        CONFIDENTIAL &bull; PREPARED FOR INCUBATION AND INVESTOR EVALUATION ONLY &bull; NOT FOR PUBLIC DISTRIBUTION
+      </div>
+    </footer>
+
+  </main>
+
+  <script>
+    // Financial Calculation Engine with Dynamic Driver Updates
+    function updateModel() {
+      const adr = parseFloat(document.getElementById('input-daily-rate').value) || 5500;
+      const duration = parseFloat(document.getElementById('input-trip-days').value) || 3.0;
+      const takeRate = (parseFloat(document.getElementById('input-take-rate').value) || 18.0) / 100;
+      const tripsPm = parseFloat(document.getElementById('input-bookings-pm').value) || 4.0;
+
+      const activeVehicles = [120, 450, 1350, 3300, 6800];
+      const gbvPerTrip = adr * duration;
+
+      document.getElementById('kpi-revpercar').innerText = 'KES ' + Math.round(12 * tripsPm * gbvPerTrip * takeRate).toLocaleString();
+
+      let cumCash = 0;
+
+      for (let i = 0; i < 5; i++) {
+        const active = activeVehicles[i];
+        const tripsYear = active * tripsPm * 12;
+        const gbv = tripsYear * gbvPerTrip;
+        const rev = gbv * takeRate;
+        const cor = gbv * 0.03; // payment & verification
+        const gp = rev - cor;
+
+        // Base opex
+        const opexTable = [
+          [1800, 4200, 4800, 1200],
+          [4200, 15000, 14400, 3600],
+          [10800, 38000, 36000, 9600],
+          [24000, 85000, 84000, 20000],
+          [48000, 170000, 168000, 42000]
+        ];
+        const [tech, mkt, staff, adm] = opexTable[i];
+        const totalOpex = tech + mkt + staff + adm;
+
+        const ebitda = (gp / 1000) - totalOpex;
+        const ebMargin = rev > 0 ? (ebitda / (rev / 1000)) * 100 : 0;
+        const dep = [350, 950, 2400, 5500, 11000][i];
+        const ebit = ebitda - dep;
+        const tax = ebit > 0 ? ebit * 0.30 : 0;
+        const netProfit = ebit - tax;
+
+        // Cash flow
+        const ocf = netProfit + dep;
+        const capex = [600, 1800, 4500, 10000, 20000][i];
+        const wc = [400, 1200, 3200, 8000, 15000][i];
+        const fcf = ocf - capex - wc;
+        cumCash += fcf;
+
+        // Update Driver DOM
+        const elBookings = document.getElementById(`drv-bookings-${i}`);
+        if (elBookings) elBookings.innerText = Math.round(tripsYear).toLocaleString();
+
+        const elGbvTrip = document.getElementById(`drv-gbvtrip-${i}`);
+        if (elGbvTrip) elGbvTrip.innerText = Math.round(gbvPerTrip).toLocaleString();
+
+        const elTake = document.getElementById(`drv-take-${i}`);
+        if (elTake) elTake.innerText = (takeRate * 100).toFixed(1) + '%';
+
+        // Update P&L DOM ('000s)
+        const setVal = (id, val, prefix = '') => {
+          const el = document.getElementById(id);
+          if (el) el.innerText = (val >= 0 ? prefix : '') + Math.round(val).toLocaleString();
+        };
+
+        setVal(`pl-gbv-${i}`, gbv / 1000);
+        setVal(`pl-rev-${i}`, rev / 1000);
+        setVal(`pl-cor-${i}`, -cor / 1000, '(');
+        setVal(`pl-gp-${i}`, gp / 1000);
+        setVal(`pl-ebitda-${i}`, ebitda, ebitda >= 0 ? '+' : '');
+        const elEbMargin = document.getElementById(`pl-ebmargin-${i}`);
+        if (elEbMargin) elEbMargin.innerText = ebMargin.toFixed(1) + '%';
+        setVal(`pl-tax-${i}`, -tax, '(');
+        setVal(`pl-net-${i}`, netProfit, netProfit >= 0 ? '+' : '');
+
+        // Update CF DOM
+        setVal(`cf-ocf-${i}`, ocf, ocf >= 0 ? '+' : '');
+        setVal(`cf-fcf-${i}`, fcf, fcf >= 0 ? '+' : '');
+        setVal(`cf-cum-${i}`, cumCash, cumCash >= 0 ? '+' : '');
+      }
+    }
+
+    function resetDefaults() {
+      document.getElementById('input-daily-rate').value = 5500;
+      document.getElementById('input-trip-days').value = 3.0;
+      document.getElementById('input-take-rate').value = 18.0;
+      document.getElementById('input-bookings-pm').value = 4.0;
+      updateModel();
+    }
+
+    window.addEventListener('DOMContentLoaded', updateModel);
+  </script>
+</body>
+</html>

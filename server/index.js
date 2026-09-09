@@ -8,6 +8,7 @@ import { execFile } from 'child_process';
 import { bundle } from '@remotion/bundler';
 import { renderMedia, selectComposition } from '@remotion/renderer';
 import { createClient } from '@supabase/supabase-js';
+import rateLimit from 'express-rate-limit';
 
 dotenv.config();
 
@@ -25,6 +26,18 @@ if (!fs.existsSync(RENDERS_DIR)) {
 const app = express();
 app.use(cors());
 app.use(express.json());
+
+// Rate limiting to prevent abuse
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // limit each IP to 100 requests per windowMs
+    message: {
+        error: 'Too many requests from this IP, please try again after 15 minutes'
+    },
+    standardHeaders: true, // Return rate limit info in the `RateLimit-*` headers
+    legacyHeaders: false, // Disable the `X-RateLimit-*` headers
+});
+app.use(limiter);
 
 // Serve pre-rendered videos as static files with correct MIME type
 app.use('/renders', express.static(RENDERS_DIR, {
@@ -85,9 +98,27 @@ function getRenderConfig(renderType) {
 app.post('/api/render-car-video', async (req, res) => {
     const { carId, renderType = 'showcase' } = req.body;
 
-    if (!carId) {
-        return res.status(400).json({ error: 'carId is required' });
+    // Input validation
+    if (!carId || typeof carId !== 'string') {
+        return res.status(400).json({ error: 'carId is required and must be a string' });
     }
+
+    // Sanitize carId - remove any potentially dangerous characters
+    const sanitizedCarId = carId.replace(/[^a-zA-Z0-9\-]/g, '');
+    if (sanitizedCarId.length === 0) {
+        return res.status(400).json({ error: 'carId contains invalid characters' });
+    }
+
+    // Validate renderType
+    const allowedRenderTypes = ['showcase', 'og_video', 'reel', 'ad', 'onboarding', 'hero'];
+    if (!allowedRenderTypes.includes(renderType)) {
+        return res.status(400).json({ 
+            error: `Invalid renderType. Must be one of: ${allowedRenderTypes.join(', ')}` 
+        });
+    }
+
+    // Use sanitized input
+    const cleanCarId = sanitizedCarId;
 
     try {
         // 1. Mark as pending/rendering in DB to avoid collisions
@@ -273,6 +304,11 @@ app.post('/api/render-car-video', async (req, res) => {
 // Implement basic cleanup for old renders (older than 1 day)
 app.delete('/api/cleanup-renders', (req, res) => {
     try {
+        // Verify directory exists
+        if (!fs.existsSync(RENDERS_DIR)) {
+            return res.status(404).json({ error: 'Renders directory not found' });
+        }
+
         const files = fs.readdirSync(RENDERS_DIR);
         const now = Date.now();
         let deletedCount = 0;
@@ -281,64 +317,126 @@ app.delete('/api/cleanup-renders', (req, res) => {
             if (!file.endsWith('.mp4')) return;
 
             const filePath = path.join(RENDERS_DIR, file);
-            const stats = fs.statSync(filePath);
-            const ageMs = now - stats.mtimeMs;
+            try {
+                const stats = fs.statSync(filePath);
+                const ageMs = now - stats.mtimeMs;
 
-            // 24 hours in milliseconds
-            if (ageMs > 24 * 60 * 60 * 1000) {
-                fs.unlinkSync(filePath);
-                deletedCount++;
+                // 24 hours in milliseconds
+                if (ageMs > 24 * 60 * 60 * 1000) {
+                    fs.unlinkSync(filePath);
+                    deletedCount++;
+                    console.log(`Deleted old render: ${file}`);
+                }
+            } catch (fileErr) {
+                console.warn(`Could not process file ${file}:`, fileErr.message);
             }
         });
 
+        console.log(`Cleanup completed: ${deletedCount} files deleted`);
         res.json({ success: true, deletedCount });
     } catch (err) {
         console.error('Cleanup error:', err);
-        res.status(500).json({ error: 'Cleanup failed' });
+        res.status(500).json({ error: 'Cleanup failed', details: err.message });
     }
 });
 
 // Endpoint to force browser to download the file instead of playing it
 app.get('/api/download', (req, res) => {
-    const fileUrl = req.query.url;
-    const downloadName = req.query.name || 'glidex-video.mp4';
-    if (!fileUrl || !fileUrl.startsWith('/renders/')) {
-        return res.status(400).json({ error: 'Invalid file URL' });
-    }
+    try {
+        const fileUrl = req.query.url;
+        const downloadName = req.query.name || 'glidex-video.mp4';
+        
+        // Input validation
+        if (!fileUrl || typeof fileUrl !== 'string') {
+            return res.status(400).json({ error: 'fileUrl is required and must be a string' });
+        }
+        
+        if (!fileUrl.startsWith('/renders/')) {
+            return res.status(400).json({ error: 'Invalid file URL' });
+        }
 
-    const filename = path.basename(fileUrl);
-    const filePath = path.join(RENDERS_DIR, filename);
+        // Sanitize fileUrl to prevent directory traversal
+        const sanitizedFileUrl = fileUrl.replace(/\.\./g, '');
+        if (sanitizedFileUrl !== fileUrl) {
+            return res.status(400).json({ error: 'Invalid file URL: directory traversal not allowed' });
+        }
 
-    if (fs.existsSync(filePath)) {
+        const filename = path.basename(sanitizedFileUrl);
+        const filePath = path.join(RENDERS_DIR, filename);
+
+        // Check if file exists
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ error: 'File not found on server' });
+        }
+
+        // Get file stats
+        const stat = fs.statSync(filePath);
+        
+        // Set headers
         res.setHeader('Content-Type', 'video/mp4');
         res.setHeader('Content-Disposition', `attachment; filename="${downloadName}"`);
         res.setHeader('Cache-Control', 'no-cache');
-        const stat = fs.statSync(filePath);
         res.setHeader('Content-Length', stat.size);
+        
+        // Stream file
         const stream = fs.createReadStream(filePath);
         stream.pipe(res);
-    } else {
-        res.status(404).json({ error: 'File not found on server' });
+        
+        // Handle stream errors
+        stream.on('error', (err) => {
+            console.error('Stream error:', err);
+            if (!res.headersSent) {
+                res.status(500).json({ error: 'Internal server error' });
+            }
+        });
+        
+        // Handle response finish
+        res.on('finish', () => {
+            stream.destroy();
+        });
+    } catch (err) {
+        console.error('Download error:', err);
+        if (!res.headersSent) {
+            res.status(500).json({ error: 'Internal server error', details: err.message });
+        }
     }
 });
 
 // Re-encode an existing render for compatibility (fix broken videos)
 app.post('/api/reencode', async (req, res) => {
-    const { url } = req.body;
-    if (!url || !url.startsWith('/renders/')) {
-        return res.status(400).json({ error: 'Invalid file URL' });
-    }
-
-    const filename = path.basename(url);
-    const inputPath = path.join(RENDERS_DIR, filename);
-    const outputFilename = filename.replace('.mp4', '-compat.mp4');
-    const outputPath = path.join(RENDERS_DIR, outputFilename);
-
-    if (!fs.existsSync(inputPath)) {
-        return res.status(404).json({ error: 'Source file not found' });
-    }
-
     try {
+        const { url } = req.body;
+        
+        // Input validation
+        if (!url || typeof url !== 'string') {
+            return res.status(400).json({ error: 'url is required and must be a string' });
+        }
+        
+        if (!url.startsWith('/renders/')) {
+            return res.status(400).json({ error: 'Invalid file URL' });
+        }
+
+        // Sanitize URL to prevent directory traversal
+        const sanitizedUrl = url.replace(/\.\./g, '');
+        if (sanitizedUrl !== url) {
+            return res.status(400).json({ error: 'Invalid file URL: directory traversal not allowed' });
+        }
+
+        const filename = path.basename(sanitizedUrl);
+        const inputPath = path.join(RENDERS_DIR, filename);
+        const outputFilename = filename.replace('.mp4', '-compat.mp4');
+        const outputPath = path.join(RENDERS_DIR, outputFilename);
+
+        // Check if input file exists
+        if (!fs.existsSync(inputPath)) {
+            return res.status(404).json({ error: 'Source file not found' });
+        }
+
+        // Check if output file already exists to prevent overwriting
+        if (fs.existsSync(outputPath)) {
+            return res.status(409).json({ error: 'Output file already exists' });
+        }
+
         await new Promise((resolve, reject) => {
             execFile('ffmpeg', [
                 '-i', inputPath,
@@ -352,15 +450,36 @@ app.post('/api/reencode', async (req, res) => {
                 '-an',                // no audio track needed
                 '-y',
                 outputPath,
-            ], { timeout: 120000 }, (error) => {
-                if (error) reject(error);
-                else resolve();
+            ], { timeout: 120000 }, (error, stdout, stderr) => {
+                if (error) {
+                    console.error('FFmpeg error:', error);
+                    reject(error);
+                } else {
+                    // Log ffmpeg output for debugging
+                    if (stdout) console.log('FFmpeg stdout:', stdout);
+                    if (stderr) console.warn('FFmpeg stderr:', stderr);
+                    resolve();
+                }
             });
         });
+
+        // Verify output file was created
+        if (!fs.existsSync(outputPath)) {
+            throw new Error('Output file was not created');
+        }
 
         res.json({ success: true, outputUrl: `/renders/${outputFilename}` });
     } catch (error) {
         console.error('Re-encode failed:', error);
+        // Clean up output file if it was partially created
+        try {
+            if (fs.existsSync(outputPath)) {
+                fs.unlinkSync(outputPath);
+            }
+        } catch (cleanupError) {
+            console.warn('Failed to cleanup partial output file:', cleanupError.message);
+        }
+        
         res.status(500).json({ error: 'Re-encode failed', details: error.message });
     }
 });

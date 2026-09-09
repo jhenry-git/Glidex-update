@@ -14,11 +14,23 @@ import { GeneralFAQSchema } from '@/components/seo/GeneralFAQSchema';
 import { PricingFAQSchema } from '@/components/seo/PricingFAQSchema';
 import { SafetyFAQSchema } from '@/components/seo/SafetyFAQSchema';
 
+/**
+ * HomePage — Main landing page for GlideX website
+ * 
+ * Displays the hero section, featured cars, trust metrics, traveler stories,
+ * and call-to-action sections for the GlideX car rental platform.
+ * 
+ * Features:
+ *   - Dynamic title and SEO metadata
+ *   - Featured car listings from API
+ *   - Scroll-to-top on mount for better UX
+ *   - Responsive design with Tailwind CSS
+ */
 export default function HomePage() {
     const [featuredCars, setFeaturedCars] = useState<FormattedCar[]>([]);
 
     useEffect(() => {
-        // Set document title
+        // Set document title for SEO and browser tab
         document.title = "GlideX – Rent, Host & Chauffeur Cars in Kenya";
 
         // Fetch top cars for the Featured Fleet section
@@ -30,7 +42,7 @@ export default function HomePage() {
                 console.error("Failed to fetch featured cars:", err);
             });
 
-        // Scroll to top on mount
+        // Scroll to top on mount for better user experience
         window.scrollTo(0, 0);
     }, []);
 
