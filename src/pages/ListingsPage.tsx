@@ -27,7 +27,7 @@ export default function ListingsPage() {
         "itemListElement": cars.map((car, index) => ({
             "@type": "ListItem",
             "position": index + 1,
-            "url": `https://glidex.co.ke/car/${car.id}`
+            "url": `https://glidexp.com/car/${car.id}`
         }))
     }), [cars]);
 

@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /*?*
 
-Sitemap: https://glidex.co.ke/sitemap.xml
+Sitemap: https://glidexp.com/sitemap.xml

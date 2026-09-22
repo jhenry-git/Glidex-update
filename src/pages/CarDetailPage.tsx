@@ -161,19 +161,19 @@ export default function CarDetailPage() {
                                     "@type": "ListItem",
                                     "position": 1,
                                     "name": "Home",
-                                    "item": "https://glidex.co.ke/"
+                                    "item": "https://glidexp.com/"
                                 },
                                 {
                                     "@type": "ListItem",
                                     "position": 2,
-                                    "name": "Listings",
-                                    "item": "https://glidex.co.ke/listings"
+                                    "name": "Browse Fleet",
+                                    "item": "https://glidexp.com/listings"
                                 },
                                 {
                                     "@type": "ListItem",
                                     "position": 3,
-                                    "name": car.location,
-                                    "item": `https://glidex.co.ke/listings?location=${encodeURIComponent(car.location)}`
+                                    "name": `${car.location} Rentals`,
+                                    "item": `https://glidexp.com/listings?location=${encodeURIComponent(car.location)}`
                                 },
                                 {
                                     "@type": "ListItem",
