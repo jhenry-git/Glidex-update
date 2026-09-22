@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 1080">
+  <!-- Background -->
+  <rect width="1080" height="1080" fill="#0f3460"/>
+  
+  <!-- Gradient overlay -->
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#000000;stop-opacity:0.6" />
+      <stop offset="100%" style="stop-color:#000000;stop-opacity:0.2" />
+    </linearGradient>
+  </defs>
+  <rect width="1080" height="1080" fill="url(#grad)"/>
+  
+  <!-- Car Image Placeholder -->
+  <rect x="90" y="150" width="900" height="500" fill="#2a2a4a" rx="20"/>
+  <text x="540" y="420" font-family="Arial" font-size="24" fill="#888" text-anchor="middle">[CAR IMAGE: Mercedes-Benz C250]</text>
+  
+  <!-- Car Name -->
+  <text x="540" y="750" font-family="Arial" font-size="72" fill="white" text-anchor="middle" font-weight="bold">Mercedes-Benz C250</text>
+  
+  <!-- Price -->
+  <text x="540" y="830" font-family="Arial" font-size="56" fill="#3b82f6" text-anchor="middle" font-weight="bold">KES 1.6M</text>
+  
+  <!-- Details -->
+  <text x="540" y="890" font-family="Arial" font-size="32" fill="#94a3b8" text-anchor="middle">2011 • 100,000 km</text>
+  
+  <!-- CTA Button -->
+  <rect x="390" y="940" width="300" height="80" rx="40" fill="#3b82f6"/>
+  <text x="540" y="995" font-family="Arial" font-size="36" fill="white" text-anchor="middle" font-weight="bold">View Details</text>
+  
+  <!-- GlideX Branding -->
+  <text x="540" y="1050" font-family="Arial" font-size="20" fill="#64748b" text-anchor="middle">GlideX Cars • glidexcars.com</text>
+</svg>

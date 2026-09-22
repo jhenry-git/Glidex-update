@@ -3,9 +3,17 @@ html {
     scroll-behavior: smooth;
 }
 
+.hidden {
+    display: none !important;
+}
+
 /* --- NEW STYLES FOR CHAT WIDGET --- */
 #chat-widget {
     transition: all 0.3s ease-in-out;
+}
+
+#chat-widget.hidden {
+    display: none !important;
 }
 
 #chat-messages::-webkit-scrollbar {

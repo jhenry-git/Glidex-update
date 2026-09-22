@@ -38,13 +38,13 @@ export default function Navbar() {
                     }`}
             >
                 {/* Logo */}
-                <Link to="/" className="flex items-center gap-2 z-[101]">
+                <Link to="/" className="flex items-center gap-2 z-[101] shrink-0">
                     <img src="/logo.png" alt="GlideX Emblem" className="h-8 w-auto object-contain" />
                     <span className="font-display text-xl font-bold text-[#0B0F17]">GlideX</span>
                 </Link>
 
                 {/* Desktop Links */}
-                <div className="hidden md:flex items-center gap-8">
+                <div className="hidden lg:flex items-center gap-5 xl:gap-8">
                     {isHomePage &&
                         homeLinks.map((link) => (
                             <a
@@ -64,17 +64,29 @@ export default function Navbar() {
                     >
                         Browse Cars
                     </Link>
+                    <Link
+                        to="/safaris"
+                        className={`text-sm font-medium transition-colors flex items-center gap-1.5 ${location.pathname.startsWith('/safaris') || location.pathname.startsWith('/tours')
+                            ? 'text-[#D7A04D]'
+                            : 'text-[#0B0F17] hover:text-[#D7A04D]'
+                            }`}
+                    >
+                        <span>Safaris & Tours</span>
+                        <span className="text-[10px] uppercase font-bold tracking-wider px-1.5 py-0.5 rounded bg-[#D7A04D]/20 text-[#B8862D]">
+                            New
+                        </span>
+                    </Link>
                 </div>
 
                 {/* Right side: CTA + Hamburger */}
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 relative z-[101] shrink-0">
                     <Link to="/listings" className="btn-primary text-sm hidden sm:inline-flex">
                         <Car className="w-4 h-4 mr-2" />
                         Book a car
                     </Link>
                     <button
                         onClick={() => setMenuOpen(!menuOpen)}
-                        className="md:hidden relative z-[101] w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
+                        className="lg:hidden relative z-[101] w-10 h-10 flex items-center justify-center rounded-full hover:bg-black/5 transition-colors"
                         aria-label={menuOpen ? 'Close menu' : 'Open menu'}
                     >
                         {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
@@ -84,7 +96,7 @@ export default function Navbar() {
 
             {/* Mobile Menu Overlay */}
             <div
-                className={`fixed inset-0 z-[99] md:hidden transition-all duration-400 ${menuOpen
+                className={`fixed inset-0 z-[99] lg:hidden transition-all duration-400 ${menuOpen
                     ? 'opacity-100 pointer-events-auto'
                     : 'opacity-0 pointer-events-none'
                     }`}
@@ -124,6 +136,24 @@ export default function Navbar() {
                         }}
                     >
                         Browse Cars
+                    </Link>
+
+                    {/* Safaris & Tours link */}
+                    <Link
+                        to="/safaris"
+                        onClick={handleLinkClick}
+                        className={`text-3xl font-display font-bold text-[#0B0F17] hover:text-[#D7A04D] transition-all duration-300 py-3 flex items-center gap-2 ${menuOpen ? 'translate-y-0 opacity-100' : 'translate-y-4 opacity-0'
+                            }`}
+                        style={{
+                            transitionDelay: menuOpen
+                                ? `${(isHomePage ? homeLinks.length : 0) * 60 + 160}ms`
+                                : '0ms',
+                        }}
+                    >
+                        <span>Safaris & Tours</span>
+                        <span className="text-xs uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-[#D7A04D]/20 text-[#B8862D]">
+                            New
+                        </span>
                     </Link>
 
                     {/* Mobile CTA */}

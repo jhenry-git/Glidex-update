@@ -14,8 +14,14 @@ const GENKIT_AGENT_URL = 'https://glidex-ai.vercel.app/api/agent';
 
 let chatHistory = [];
 
-chatToggle.addEventListener('click', () => { chatWidget.classList.toggle('hidden'); });
-chatClose.addEventListener('click', () => { chatWidget.classList.add('hidden'); });
+chatToggle.addEventListener('click', () => {
+    chatWidget.classList.toggle('hidden');
+    chatWidget.style.display = chatWidget.classList.contains('hidden') ? 'none' : 'flex';
+});
+chatClose.addEventListener('click', () => {
+    chatWidget.classList.add('hidden');
+    chatWidget.style.display = 'none';
+});
 
 function getChatHistoryContext(numMessages = 3) {
     let context = "--- Last few messages with AI ---\n";

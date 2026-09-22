@@ -206,10 +206,14 @@ export const JourneyGenerator: React.FC = () => {
 
                                 <div className="flex items-center gap-4">
                                     <button
-                                        onClick={() => navigate('/listings')}
-                                        className="px-6 py-3 bg-white text-black font-sans text-sm tracking-widest uppercase hover:bg-sand-200 transition-colors flex items-center gap-2"
+                                        onClick={() => {
+                                            const isSafari = getResult().route.includes('Migration') || getResult().carType.includes('Safari');
+                                            navigate(isSafari ? '/safaris?package=maasai-mara' : '/listings');
+                                        }}
+                                        className="px-6 py-3 bg-white text-black font-sans text-sm tracking-widest uppercase hover:bg-sand-200 transition-colors flex items-center gap-2 cursor-pointer"
                                     >
-                                        Find Vehicles <ArrowRight className="w-4 h-4" />
+                                        <span>{getResult().route.includes('Migration') ? 'Explore Safaris' : 'Find Vehicles'}</span>
+                                        <ArrowRight className="w-4 h-4" />
                                     </button>
                                     <button
                                         onClick={resetQuiz}

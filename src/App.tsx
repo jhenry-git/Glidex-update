@@ -25,6 +25,7 @@ const CarDetailPage = lazy(() => import('@/pages/CarDetailPage'));
 const HostDashboard = lazy(() => import('@/components/dashboard/HostDashboard'));
 const SignDocumentPage = lazy(() => import('@/pages/SignDocumentPage'));
 const FounderProfilePage = lazy(() => import('@/pages/FounderProfilePage'));
+const SafarisPage = lazy(() => import('@/pages/SafarisPage'));
 
 function PageLoader() {
   return (
@@ -51,6 +52,9 @@ function App() {
             <Route path="/sign/:id" element={<SignDocumentPage />} />
             <Route path="/founder" element={<FounderProfilePage />} />
             <Route path="/founder-profile" element={<FounderProfilePage />} />
+            <Route path="/safaris" element={<SafarisPage />} />
+            <Route path="/tours" element={<SafarisPage />} />
+            <Route path="/safaris-and-tours" element={<SafarisPage />} />
             <Route path="/login" element={<LoginPage />} />
             <Route path="/register" element={<RegisterPage />} />
           </Routes>
